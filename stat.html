@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Water Parameters Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .parameter-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .parameter-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col items-center justify-center p-6">
+  <header class="mb-8">
+    <h1 class="text-3xl font-semibold text-gray-800">Environmental Condition - Điều Kiện Môi Trường</h1>
+  </header>
+<!--invisible checkbox-->
+  <input type = "checkbox" id = "phCheckbox" style = "display:none;">
+  <input type = "checkbox" id = "doCheckbox" style = "display:none;">
+  <input type = "checkbox" id = "ecCheckbox" style = "display:none;">
+  <input type = "checkbox" id = "atCheckbox" style = "display:none;">
+  <input type = "checkbox" id = "wtCheckbox" style = "display:none;">
+  <input type = "checkbox" id = "hmCheckbox" style = "display:none;">
+  <input type = "checkbox" id = "wfCheckbox" style = "display:none;">
+  <input type = "checkbox" id = "wlCheckbox" style = "display:none;">
+  <input type = "checkbox" id = "tdsCheckbox" style = "display:none;">
+  <input type="checkbox" id="liCheckbox" style="display:none;">
+
+  <script>
+    const eraWidget = new eraWidget();
+    let configPh = null;
+    let configDo = null;
+    let configEc = null;
+    let configAt = null;
+    let configWt = null;
+    let configHm = null;
+    let configTds = null;
+    let configWf = null;
+    let configWl = null;
+    let configLi = null;
+
+    eraWidget.onConfiguration(
+        (configuration) => {
+        configEc = configuration.realtime_configs.find(config => config.name == "EC")
+        configTds = configuration.realtime_configs.find(config => config.name == "TDS")
+        configDo = configuration.realtime_configs.find(config => config.name == "DO")
+        configAt = configuration.realtime_configs.find(config => config.name == "AT")
+        configWt = configuration.realtime_configs.find(config => config.name == "WT")
+        configPh = configuration.realtime_configs.find(config => config.name == "PH")
+        configLi = configuration.realtime_configs.find(config => config.name == "LI")
+        configHm = configuration.realtime_configs.find(config => config.name == "HM")
+        configLi = configuration.realtime_configs.find(config => config.name = "LI" )
+    })
+    eraWidget.onValues(
+        (values) => {
+        if (configEc && values[configEc.id]) {
+            const ecValue = values[configEc.id].value;
+            document.getElementById('ecCheckbox').checked = ecValue > 0;
+            document.getElementById('ec').value = ecValue;
+        }
+        if (configTds && values[configTds.id]) {
+            const tdsValue = values[configTds.id].value;
+            document.getElementById('tdsCheckbox').checked = tdsValue > 0;
+            document.getElementById('tds').value = tdsValue;
+        }
+        if (configDo && values[configDo.id]) {
+            const doValue = values[configDo.id].value;
+            document.getElementById('doCheckbox').checked = doValue > 0;
+            document.getElementById('do').value = doValue;
+        }
+        if (configAt && values[configAt.id]) {
+            const atValue = values[configAt.id].value;
+            document.getElementById('atCheckbox').checked = atValue > 0;
+            document.getElementById('airtemp').value = atValue;
+        }
+        if (configWt && values[configWt.id]) {
+            const wtValue = values[configWt.id].value;
+            document.getElementById('wtCheckbox').checked = wtValue > 0;
+            document.getElementById('watertemp').value = wtValue;
+        }
+        if (configPh && values[configPh.id]) {
+            const phValue = values[configPh.id].value;
+            document.getElementById('phCheckbox').checked = phValue > 0;
+            document.getElementById('ph').value = phValue;
+        }
+        if (configLi && values[configLi.id]) {
+            const liValue = values[configLi.id].value;
+            document.getElementById('liCheckbox').checked = liValue > 0;
+            document.getElementById('light').value = liValue;
+}
+        if (configHm && values[configHm.id]) {
+            const hmValue = values[configHm.id].value;
+            document.getElementById('hmCheckbox').checked = hmValue > 0;
+            document.getElementById('hm').value = hmValue;
+        }
+        if (configLi && values[configLi.id]) {
+            const liValue = values[configLi.id].value;
+            document.getElementById('liCheckbox').checked = liValue > 0;
+            document.getElementById('li').value = liValue;
+}
+
+    })
+
+
+  </script>
+
+  <!-- Grid layout -->
+  <main class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
+    <!-- 1 -->
+    <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
+      <i class="fas fa-tint text-blue-500 text-3xl"></i>
+      <div>
+        <h2 class="text-lg font-semibold text-gray-700">pH</h2>
+        <p class="text-2xl font-bold text-gray-900" id = "ph"></p>
+      </div>
+    </div>
+
+    <!-- 2 -->
+    <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
+      <i class="fas fa-wind text-green-500 text-3xl"></i>
+      <div>
+        <h2 class="text-lg font-semibold text-gray-700">DO (Dissolved Oxygen)</h2>
+        <p class="text-2xl font-bold text-gray-900" id = "do"> mg/L</p>
+      </div>
+    </div>
+
+    <!-- 3 -->
+    <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
+      <i class="fas fa-flask text-purple-500 text-3xl"></i>
+      <div>
+        <h2 class="text-lg font-semibold text-gray-700">EC</h2>
+        <p class="text-2xl font-bold text-gray-900" id = "ec"> µS/cm</p>
+      </div>
+    </div>
+
+    <!-- 4 -->
+    <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
+      <i class="fas fa-water text-teal-500 text-3xl"></i>
+      <div>
+        <h2 class="text-lg font-semibold text-gray-700">TDS</h2>
+        <p class="text-2xl font-bold text-gray-900" id = "tds"> ppm</p>
+      </div>
+    </div>
+
+    <!-- 5 -->
+    <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
+      <i class="fas fa-thermometer-half text-red-500 text-3xl"></i>
+      <div>
+        <h2 class="text-lg font-semibold text-gray-700">Air Temperature</h2>
+        <p class="text-2xl font-bold text-gray-900" id = "airtemp"> °C</p>
+      </div>
+    </div>
+
+    <!-- Nhiệt độ nước -->
+    <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
+      <i class="fas fa-thermometer-three-quarters text-cyan-500 text-3xl"></i>
+      <div>
+        <h2 class="text-lg font-semibold text-gray-700">Water Temperature</h2>
+        <p class="text-2xl font-bold text-gray-900" id = "watertemp"> °C</p>
+      </div>
+    </div>
+
+    <!-- 7 -->
+    <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
+      <i class="fas fa-cloud-sun text-yellow-500 text-3xl"></i>
+      <div>
+        <h2 class="text-lg font-semibold text-gray-700">Humidity</h2>
+        <p class="text-2xl font-bold text-gray-900" id = "hm">%</p>
+      </div>
+    </div>
+
+    <!-- 8 -->
+    <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
+      <i class="fas fa-water-arrow-down text-indigo-500 text-3xl"></i>
+      <div>
+        <h2 class="text-lg font-semibold text-gray-700">Water Flow</h2>
+        <p class="text-2xl font-bold text-gray-900" > L/min</p>
+      </div>
+    </div>
+
+    <!--  Water Level -->
+    <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4 col-span-1 md:col-start-2">
+      <i class="fas fa-tachometer-alt text-pink-500 text-3xl"></i>
+      <div>
+        <h2 class="text-lg font-semibold text-gray-700">Water Level</h2>
+        <p class="text-2xl font-bold text-gray-900">High</p>
+      </div>
+    </div>
+    <!-- Light Intensity -->
+    <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4 col-span-1">
+     <i class="fas fa-lightbulb text-yellow-400 text-3xl"></i>
+     <div>
+        <h2 class="text-lg font-semibold text-gray-700">Light Intensity</h2>
+        <p class="text-2xl font-bold text-gray-900" id="li">lux</p>
+    </div>
+</div>
+  </main>
+</body>
+</html>

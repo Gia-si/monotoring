@@ -70,7 +70,7 @@
     if (configPh && values[configPh.id]) {
       const phValue = values[configPh.id].value;
       document.getElementById('phCheckbox').checked = phValue > 0;
-      document.getElementById('ph').textContent = phValue.toFixed(2);
+      document.getElementById('ph').innerText = phValue.toFixed(2);
     }
 
     if (configDo && values[configDo.id]) {

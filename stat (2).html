@@ -54,7 +54,7 @@
   let configLi = null;
 
   eraWidget.onConfiguration((configuration) => {
-    configPh = configuration.realtime_configs.find(config => config.name === 'V0');
+    configPh = configuration.realtime_configs.find(config => config.pin === 'V0');
     configDo = configuration.realtime_configs.find(config => config.name === 'DO');
     configEc = configuration.realtime_configs.find(config => config.name === 'EC');
     configWt = configuration.realtime_configs.find(config => config.name === 'TO');

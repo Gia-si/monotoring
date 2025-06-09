@@ -48,7 +48,7 @@
   eraWidget.init({
     onConfiguration: (configuration) => {
       // Tìm config có name 'PH' hoặc lấy phần tử đầu nếu chắc chắn đó là PH
-      configPh = configuration.realtime_configs.find(c => c.name === 'PH') || configuration.realtime_configs[0];
+      configPh = configuration.realtime_configs.find(c => c.pin === 'V0') || configuration.realtime_configs[0];
     },
     onValues: (values) => {
       if (configPh && values[configPh.id]) {

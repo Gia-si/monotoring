@@ -35,7 +35,7 @@
   <input type = "checkbox" id = "wlCheckbox" style = "display:none;">
   <input type = "checkbox" id = "tdsCheckbox" style = "display:none;">
   <input type="checkbox" id="liCheckbox" style="display:none;">
-
+  <script src="https://wwww.unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
   <script>
     const eraWidget = new eraWidget();
     let configPh = null;
@@ -54,12 +54,12 @@
         configEc = configuration.realtime_configs.find(config => config.name == "EC")
         configTds = configuration.realtime_configs.find(config => config.name == "TDS")
         configDo = configuration.realtime_configs.find(config => config.name == "DO")
-        configAt = configuration.realtime_configs.find(config => config.name == "AT")
-        configWt = configuration.realtime_configs.find(config => config.name == "WT")
+        configAt = configuration.realtime_configs.find(config => config.name == "TEMP")
+        configWt = configuration.realtime_configs.find(config => config.name == "TO")
         configPh = configuration.realtime_configs.find(config => config.name == "PH")
-        configLi = configuration.realtime_configs.find(config => config.name == "LI")
-        configHm = configuration.realtime_configs.find(config => config.name == "HM")
-        configLi = configuration.realtime_configs.find(config => config.name = "LI" )
+        configLi = configuration.realtime_configs.find(config => config.name == "LUX")
+        configHm = configuration.realtime_configs.find(config => config.name == "HUMID")
+        configwf = configuration.realtime_configs.find(config => config.name == "WF")
     })
     eraWidget.onValues(
         (values) => {
@@ -104,9 +104,9 @@
             document.getElementById('hm').value = hmValue;
         }
         if (configLi && values[configLi.id]) {
-            const liValue = values[configLi.id].value;
-            document.getElementById('liCheckbox').checked = liValue > 0;
-            document.getElementById('li').value = liValue;
+            const wfValue = values[configwf.id].value;
+            document.getElementById('wfCheckbox').checked = wfValue > 0;
+            document.getElementById('wf').value = wfValue;
 }
 
     })

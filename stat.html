@@ -38,86 +38,97 @@
   <input type="checkbox" id="liCheckbox" style="display:none;">
 
   <script src="https://unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
-  <script>
-    const eraWidget = new eraWidget();
-    let configPh = null;
-    let configDo = null;
-    let configEc = null;
-    let configAt = null;
-    let configWt = null;
-    let configHm = null;
-    let configTds = null;
-    let configWf = null;
-    let configWl = null;
-    let configLi = null;
+ <script>
+  const eraWidget = new EraWidget();
 
-    eraWidget.onConfiguration((configuration) => {
-      configEc = configuration.realtime_configs.find(config => config.name === "EC");
-      configTds = configuration.realtime_configs.find(config => config.name === "TDS");
-      configDo = configuration.realtime_configs.find(config => config.name === "DO");
-      configAt = configuration.realtime_configs.find(config => config.name === "TEMP");
-      configWt = configuration.realtime_configs.find(config => config.name === "TO");
-      configPh = configuration.realtime_configs.find(config => config.name === "PH");
-      configLi = configuration.realtime_configs.find(config => config.name === "LUX");
-      configHm = configuration.realtime_configs.find(config => config.name === "HUMID");
-      configWf = configuration.realtime_configs.find(config => config.name === "WF");
-      configWl = configuration.realtime_configs.find(config => config.name === "WL");
-    });
+  let configPh = null;
+  let configDo = null;
+  let configEc = null;
+  let configAt = null;
+  let configWt = null;
+  let configHm = null;
+  let configTds = null;
+  let configWf = null;
+  let configWl = null;
+  let configLi = null;
 
-    eraWidget.onValues((values) => {
-      if (configEc && values[configEc.id]) {
-        const ecValue = values[configEc.id].value;
-        document.getElementById('ecCheckbox').checked = ecValue > 0;
-        document.getElementById('ec').textContent = ecValue;
-      }
-      if (configTds && values[configTds.id]) {
-        const tdsValue = values[configTds.id].value;
-        document.getElementById('tdsCheckbox').checked = tdsValue > 0;
-        document.getElementById('tds').textContent = tdsValue;
-      }
-      if (configDo && values[configDo.id]) {
-        const doValue = values[configDo.id].value;
-        document.getElementById('doCheckbox').checked = doValue > 0;
-        document.getElementById('do').textContent = doValue;
-      }
-      if (configAt && values[configAt.id]) {
-        const atValue = values[configAt.id].value;
-        document.getElementById('atCheckbox').checked = atValue > 0;
-        document.getElementById('airtemp').textContent = atValue;
-      }
-      if (configWt && values[configWt.id]) {
-        const wtValue = values[configWt.id].value;
-        document.getElementById('wtCheckbox').checked = wtValue > 0;
-        document.getElementById('watertemp').textContent = wtValue;
-      }
-      if (configPh && values[configPh.id]) {
-        const phValue = values[configPh.id].value;
-        document.getElementById('phCheckbox').checked = phValue > 0;
-        document.getElementById('ph').textContent = phValue;
-      }
-      if (configLi && values[configLi.id]) {
-        const liValue = values[configLi.id].value;
-        document.getElementById('liCheckbox').checked = liValue > 0;
-        document.getElementById('li').textContent = liValue;
-      }
-      if (configHm && values[configHm.id]) {
-        const hmValue = values[configHm.id].value;
-        document.getElementById('hmCheckbox').checked = hmValue > 0;
-        document.getElementById('hm').textContent = hmValue;
-      }
-      if (configWf && values[configWf.id]) {
-        const wfValue = values[configWf.id].value;
-        document.getElementById('wfCheckbox').checked = wfValue > 0;
-        document.getElementById('wf').textContent = wfValue;
-      }
-      if (configWl && values[configWl.id]) {
-        const wlValue = values[configWl.id].value;
-        document.getElementById('wlCheckbox').checked = wlValue > 0;
-        document.getElementById('wl').textContent = wlValue;
-      }
-    });
-      eraWidget.ready();
-  </script>
+  eraWidget.onConfiguration((configuration) => {
+    configPh = configuration.realtime_configs.find(config => config.name === 'PH');
+    configDo = configuration.realtime_configs.find(config => config.name === 'DO');
+    configEc = configuration.realtime_configs.find(config => config.name === 'EC');
+    configTds = configuration.realtime_configs.find(config => config.name === 'TDS');
+    configAt = configuration.realtime_configs.find(config => config.name === 'TEMP');
+    configWt = configuration.realtime_configs.find(config => config.name === 'TO');
+    configHm = configuration.realtime_configs.find(config => config.name === 'HUMID');
+    configLi = configuration.realtime_configs.find(config => config.name === 'LUX');
+    configWf = configuration.realtime_configs.find(config => config.name === 'WF');
+    configWl = configuration.realtime_configs.find(config => config.name === 'WL');
+  });
+
+  eraWidget.onValues((values) => {
+    if (configPh && values[configPh.id]) {
+      const phValue = values[configPh.id].value;
+      document.getElementById('phCheckbox').checked = phValue > 0;
+      document.getElementById('ph').value = phValue;
+    }
+
+    if (configDo && values[configDo.id]) {
+      const doValue = values[configDo.id].value;
+      document.getElementById('doCheckbox').checked = doValue > 0;
+      document.getElementById('do').value = doValue;
+    }
+
+    if (configEc && values[configEc.id]) {
+      const ecValue = values[configEc.id].value;
+      document.getElementById('ecCheckbox').checked = ecValue > 0;
+      document.getElementById('ec').value = ecValue;
+    }
+
+    if (configTds && values[configTds.id]) {
+      const tdsValue = values[configTds.id].value;
+      document.getElementById('tdsCheckbox').checked = tdsValue > 0;
+      document.getElementById('tds').value = tdsValue;
+    }
+
+    if (configAt && values[configAt.id]) {
+      const atValue = values[configAt.id].value;
+      document.getElementById('atCheckbox').checked = atValue > 0;
+      document.getElementById('airtemp').value = atValue;
+    }
+
+    if (configWt && values[configWt.id]) {
+      const wtValue = values[configWt.id].value;
+      document.getElementById('wtCheckbox').checked = wtValue > 0;
+      document.getElementById('watertemp').value = wtValue;
+    }
+
+    if (configHm && values[configHm.id]) {
+      const hmValue = values[configHm.id].value;
+      document.getElementById('hmCheckbox').checked = hmValue > 0;
+      document.getElementById('hm').value = hmValue;
+    }
+
+    if (configLi && values[configLi.id]) {
+      const liValue = values[configLi.id].value;
+      document.getElementById('liCheckbox').checked = liValue > 0;
+      document.getElementById('li').value = liValue;
+    }
+
+    if (configWf && values[configWf.id]) {
+      const wfValue = values[configWf.id].value;
+      document.getElementById('wfCheckbox').checked = wfValue > 0;
+      document.getElementById('wf').value = wfValue;
+    }
+
+    if (configWl && values[configWl.id]) {
+      const wlValue = values[configWl.id].value;
+      document.getElementById('wlCheckbox').checked = wlValue > 0;
+      document.getElementById('wl').value = wlValue;
+    }
+  });
+
+  eraWidget.ready();
+</script>
 
   <!-- Dashboard layout -->
   <main class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">

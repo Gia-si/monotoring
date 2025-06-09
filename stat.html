@@ -65,67 +65,67 @@
     configWl = configuration.realtime_configs.find(config => config.name === 'WL');
   });
 
- eraWidget.onValues((values) => {
-  if (configPh && values[configPh.id]) {
-    const phValue = values[configPh.id].value;
-    document.getElementById('phCheckbox').checked = phValue > 0;
-    document.getElementById('ph').textContent = phValue;
-  }
+  eraWidget.onValues((values) => {
+    if (configPh && values[configPh.id]) {
+      const phValue = values[configPh.id].value;
+      document.getElementById('phCheckbox').checked = phValue > 0;
+      document.getElementById('ph').textContent = phValue.toFixed(2);
+    }
 
-  if (configDo && values[configDo.id]) {
-    const doValue = values[configDo.id].value;
-    document.getElementById('doCheckbox').checked = doValue > 0;
-    document.getElementById('do').textContent = doValue;
-  }
+    if (configDo && values[configDo.id]) {
+      const doValue = values[configDo.id].value;
+      document.getElementById('doCheckbox').checked = doValue > 0;
+      document.getElementById('do').textContent = doValue.toFixed(2);
+    }
 
-  if (configEc && values[configEc.id]) {
-    const ecValue = values[configEc.id].value;
-    document.getElementById('ecCheckbox').checked = ecValue > 0;
-    document.getElementById('ec').textContent = ecValue;
-  }
+    if (configEc && values[configEc.id]) {
+      const ecValue = values[configEc.id].value;
+      document.getElementById('ecCheckbox').checked = ecValue > 0;
+      document.getElementById('ec').textContent = ecValue.toFixed(2);
+    }
 
-  if (configTds && values[configTds.id]) {
-    const tdsValue = values[configTds.id].value;
-    document.getElementById('tdsCheckbox').checked = tdsValue > 0;
-    document.getElementById('tds').textContent = tdsValue;
-  }
+    if (configTds && values[configTds.id]) {
+      const tdsValue = values[configTds.id].value;
+      document.getElementById('tdsCheckbox').checked = tdsValue > 0;
+      document.getElementById('tds').textContent = tdsValue.toFixed(2);
+    }
 
-  if (configAt && values[configAt.id]) {
-    const atValue = values[configAt.id].value;
-    document.getElementById('atCheckbox').checked = atValue > 0;
-    document.getElementById('airtemp').textContent = atValue;
-  }
+    if (configAt && values[configAt.id]) {
+      const atValue = values[configAt.id].value;
+      document.getElementById('atCheckbox').checked = atValue > 0;
+      document.getElementById('airtemp').textContent = atValue.toFixed(2);
+    }
 
-  if (configWt && values[configWt.id]) {
-    const wtValue = values[configWt.id].value;
-    document.getElementById('wtCheckbox').checked = wtValue > 0;
-    document.getElementById('watertemp').textContent = wtValue;
-  }
+    if (configWt && values[configWt.id]) {
+      const wtValue = values[configWt.id].value;
+      document.getElementById('wtCheckbox').checked = wtValue > 0;
+      document.getElementById('watertemp').textContent = wtValue.toFixed(2);
+    }
 
-  if (configHm && values[configHm.id]) {
-    const hmValue = values[configHm.id].value;
-    document.getElementById('hmCheckbox').checked = hmValue > 0;
-    document.getElementById('hm').textContent = hmValue;
-  }
+    if (configHm && values[configHm.id]) {
+      const hmValue = values[configHm.id].value;
+      document.getElementById('hmCheckbox').checked = hmValue > 0;
+      document.getElementById('hm').textContent = hmValue.toFixed(2);
+    }
 
-  if (configLi && values[configLi.id]) {
-    const liValue = values[configLi.id].value;
-    document.getElementById('liCheckbox').checked = liValue > 0;
-    document.getElementById('li').textContent = liValue;
-  }
+    if (configLi && values[configLi.id]) {
+      const liValue = values[configLi.id].value;
+      document.getElementById('liCheckbox').checked = liValue > 0;
+      document.getElementById('li').textContent = liValue.toFixed(2);
+    }
 
-  if (configWf && values[configWf.id]) {
-    const wfValue = values[configWf.id].value;
-    document.getElementById('wfCheckbox').checked = wfValue > 0;
-    document.getElementById('wf').textContent = wfValue;
-  }
+    if (configWf && values[configWf.id]) {
+      const wfValue = values[configWf.id].value;
+      document.getElementById('wfCheckbox').checked = wfValue > 0;
+      document.getElementById('wf').textContent = wfValue.toFixed(2);
+    }
 
-  if (configWl && values[configWl.id]) {
-    const wlValue = values[configWl.id].value;
-    document.getElementById('wlCheckbox').checked = wlValue > 0;
-    document.getElementById('wl').textContent = wlValue;
-  }
-});
+    if (configWl && values[configWl.id]) {
+      const wlValue = values[configWl.id].value;
+      document.getElementById('wlCheckbox').checked = wlValue > 0;
+      document.getElementById('wl').textContent = wlValue.toFixed(2);
+    }
+  });
 
   eraWidget.ready();
 </script>

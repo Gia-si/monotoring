@@ -1,150 +1,388 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Water Parameters Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
-    .parameter-card {
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .parameter-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://www.unpkg.com/@eohjsc/era-widget@1.0.14/src/index.js"></script>
+    <title>Phân Tích Dữ Liệu Môi Trường</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+        .container {
+            margin: 20px auto;
+            max-width: 800px;
+        }
+        .form-group {
+            margin: 10px 0;
+            text-align: left;
+            padding: 0 20px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        input[type="number"], select {
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+            width: calc(100% - 22px);
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #1c51d7;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #00b3ff;
+        }
+        #results {
+            display: none;
+            margin-top: 20px;
+        }
+        .icon {
+            font-size: 50px;
+            margin: 10px;
+        }
+        .black {
+            color: black
+        }
+        .ideal {
+            color: #4caf50; 
+        }
+        .warning {
+            color: #ff9800; 
+        }
+        .danger {
+            color: #f44336; 
+        }
+    </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col items-center justify-center p-6">
-  <header class="mb-8">
-    <h1 class="text-3xl font-semibold text-gray-800">Environmental Condition - Điều Kiện Môi Trường</h1>
-  </header>
+<body>
+    <!-- Checkbox để hiển thị trạng thái từ IoT platform -->
+    <input type="checkbox" id="ecCheckbox" style="display:none;">
+    <input type="checkbox" id="tdsCheckbox" style="display:none;">
+    <input type="checkbox" id="doCheckbox" style="display:none;">
+    <input type="checkbox" id="temperatureCheckbox" style="display:none;">
+    <input type="checkbox" id="phCheckbox" style="display:none;">
 
-  <!-- Invisible checkboxes (nếu cần dùng logic riêng) -->
-  <input type="checkbox" id="phCheckbox" style="display:none;">
-  <input type="checkbox" id="doCheckbox" style="display:none;">
-  <input type="checkbox" id="ecCheckbox" style="display:none;">
-  <input type="checkbox" id="atCheckbox" style="display:none;">
-  <input type="checkbox" id="wtCheckbox" style="display:none;">
-  <input type="checkbox" id="hmCheckbox" style="display:none;">
-  <input type="checkbox" id="wfCheckbox" style="display:none;">
-  <input type="checkbox" id="wlCheckbox" style="display:none;">
-  <input type="checkbox" id="tdsCheckbox" style="display:none;">
-  <input type="checkbox" id="liCheckbox" style="display:none;">
+    <script>
+        const eraWidget = new EraWidget();
+        let configEc = null;
+        let configTds = null;
+        let configDo = null;
+        let configT = null;
+        let configPh = null;
 
-  <script src="https://unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
-<script>
-  const eraWidget = new EraWidget();
+        eraWidget.onConfiguration((configuration) => {
+            configEc = configuration.realtime_configs.find(config => config.name === 'EC');
+            configTds = configuration.realtime_configs.find(config => config.name === 'TDS');
+            configDo = configuration.realtime_configs.find(config => config.name === 'DO');
+            configT = configuration.realtime_configs.find(config => config.name === 'TEMP');
+            configPh = configuration.realtime_configs.find(config => config.name === 'PH');
+        });
 
-  const PH = document.getElementById("ph");
+        eraWidget.onValues((values) => {
+            if (configEc && values[configEc.id]) {
+                const ecValue = values[configEc.id].value;
+                document.getElementById('ecCheckbox').checked = ecValue > 0;
+                document.getElementById('ec').value = ecValue;
+            }
 
-  let configPh = null;
+            if (configTds && values[configTds.id]) {
+                const tdsValue = values[configTds.id].value;
+                document.getElementById('tdsCheckbox').checked = tdsValue > 0;
+                document.getElementById('tds').value = tdsValue;
+            }
 
-  eraWidget.init({
-    onConfiguration: (configuration) => {
-      // Tìm config có name 'PH' hoặc lấy phần tử đầu nếu chắc chắn đó là PH
-      configPh = configuration.realtime_configs.find(c => c.pin === 'V0') || configuration.realtime_configs[0];
-    },
-    onValues: (values) => {
-      if (configPh && values[configPh.id]) {
-        const phValue = values[configPh.id].value;
-        PH.textContent = phValue.toFixed(2); // Hiển thị giá trị, làm tròn 2 số thập phân
-      }
-    },
-  });
+            if (configDo && values[configDo.id]) {
+                const doValue = values[configDo.id].value;
+                document.getElementById('doCheckbox').checked = doValue > 0;
+                document.getElementById('do').value = doValue;
+            }
 
-  eraWidget.ready();  // Bắt buộc gọi hàm ready() để khởi động widget
-</script>
+            if (configT && values[configT.id]) {
+                const tValue = values[configT.id].value;
+                document.getElementById('temperatureCheckbox').checked = tValue > 0;
+                document.getElementById('temperature').value = tValue;
+            }
 
+            if (configPh && values[configPh.id]) {
+                const phValue = values[configPh.id].value;
+                document.getElementById('phCheckbox').checked = phValue > 0;
+                document.getElementById('ph').value = phValue;
+            }
+        });
 
-  <!-- Dashboard layout -->
-  <main class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
+        eraWidget.ready();
+    </script>
 
-    <!-- Mỗi card -->
-    <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-      <i class="fas fa-tint text-blue-500 text-3xl"></i>
-      <div>
-        <h2 class="text-lg font-semibold text-gray-700">pH</h2>
-        <p class="text-2xl font-bold text-gray-900" id="ph"></p>
-      </div>
+    <div class="container" id="inputContainer">
+        <h1>Nhập Dữ Liệu Môi Trường</h1>
+        <form id="dataForm">
+            <div class="form-group">
+                <label for="tds">TDS (mg/L):</label>
+                <input type="number" id="tds" step="1" required value="0">  
+            </div>
+            <div class="form-group">
+                <label for="ec">EC (mS/cm):</label>
+                <input type="number" id="ec" step="1" required value="0"> 
+            </div>
+            <div class="form-group">
+                <label for="do">Oxy (mg/L):</label>
+                <input type="number" id="do" step="0.01" required value="0"> 
+            </div>
+            <div class="form-group">
+                <label for="temperature">Nhiệt độ (°C):</label>
+                <input type="number" id="temperature" step="1" required value="0"> 
+            </div>
+            <div class="form-group">
+                <label for="ph">pH:</label>
+                <input type="number" id="ph" step="0.1" required value="0"> 
+            </div>
+            
+            <div class="form-group">
+                <label for="waterColor">Chọn màu nước:</label>
+                <select id="waterColor">
+                    <option value="">--Chọn màu nước--</option>
+                    <option value="nâu trà">Nâu trà</option>
+                    <option value="xanh nhạt">Xanh nhạt</option>
+                    <option value="xanh đậm">Xanh đậm</option>
+                    <option value="vàng cam">Vàng cam</option>
+                    <option value="đỏ gạch">Đỏ gạch</option>
+                    <option value="đen">Đen</option>
+                    <option value="trắng đục">Trắng đục</option>
+                    <option value="trong">Trong</option>
+                </select>
+            </div>
+            <button type="button" onclick="analyzeData()">Phân tích dữ liệu</button>
+        </form>
     </div>
 
-    <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-      <i class="fas fa-wind text-green-500 text-3xl"></i>
-      <div>
-        <h2 class="text-lg font-semibold text-gray-700">DO (Dissolved Oxygen)</h2>
-        <p class="text-2xl font-bold text-gray-900" id="do">mg/L</p>
-      </div>
+    <div id="results">
+        <h1>Kết quả phân tích</h1>
+        <div id="summary"></div>
+        <button onclick="goBack()">Quay lại</button>
     </div>
 
-    <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-      <i class="fas fa-flask text-purple-500 text-3xl"></i>
-      <div>
-        <h2 class="text-lg font-semibold text-gray-700">EC</h2>
-        <p class="text-2xl font-bold text-gray-900" id="ec">µS/cm</p>
-      </div>
-    </div>
+    <script>
+        function analyzeData() {
+            const tds = parseFloat(document.getElementById('tds').value);
+            const ec = parseFloat(document.getElementById('ec').value);
+            const doValue = parseFloat(document.getElementById('do').value);
+            const temperature = parseFloat(document.getElementById('temperature').value);
+            const ph = parseFloat(document.getElementById('ph').value);
+            const waterColor = document.getElementById('waterColor').value;
 
-    <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-      <i class="fas fa-water text-teal-500 text-3xl"></i>
-      <div>
-        <h2 class="text-lg font-semibold text-gray-700">TDS</h2>
-        <p class="text-2xl font-bold text-gray-900" id="tds">ppm</p>
-      </div>
-    </div>
+            let summary = '';
+            let colorClass = '';
+            let icon = '';
 
-    <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-      <i class="fas fa-thermometer-half text-red-500 text-3xl"></i>
-      <div>
-        <h2 class="text-lg font-semibold text-gray-700">Air Temperature</h2>
-        <p class="text-2xl font-bold text-gray-900" id="airtemp">°C</p>
-      </div>
-    </div>
+// TDS
+            if (tds < 500) {
+                summary += "<p class='danger'><strong>TDS rất thấp:</strong> Tôm chậm lớn, dễ nhiễm bệnh do thiếu khoáng chất!!!</p>";
+            }
+            if (500<= tds && tds< 800) {
+                summary += "<p class='warning'><strong>TDS khá thấp:</strong> Cần theo dõi và bổ sung!!</p>";
+            }
+            if (800 <= tds && tds <= 2000) {
+                summary += "<p class='ideal'><strong>Nồng độ chất rắn hòa tan (TDS) chuẩn!</strong></p>";
+            }
+            if (2000 < tds && tds <= 3500) {
+                summary += "<p class='warning'><strong>TDS khá cao:</strong>Tôm chậm lớn, dễ stress!!</p>";
+            }
+            if (tds > 3500) {
+                summary += "<p class='danger'><strong>TDS rất cao:</strong> Tôm sẽ chết nếu ở ngưỡng này!!!</p>";
+            }
 
-    <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-      <i class="fas fa-thermometer-three-quarters text-cyan-500 text-3xl"></i>
-      <div>
-        <h2 class="text-lg font-semibold text-gray-700">Water Temperature</h2>
-        <p class="text-2xl font-bold text-gray-900" id="watertemp">°C</p>
-      </div>
-    </div>
+//EC
+            if (ec < 0.5) {
+                summary += "<p class='danger'><strong>Nồng độ EC rất thấp:</strong> nước thiếu ion và khoáng chất!!!</p>";
+            }
+            if (0.5 <= ec && ec< 1) {
+                summary += "<p class='warning'><strong>Nồng độ EC khá thấp:</strong> cần điều chỉnh kịp thời!!</p>";
+            }
+            if (1 <= ec && ec <= 3) {
+                summary += "<p class='ideal'><strong>Độ dẫn điện (EC) chuẩn!</strong></p>";
+            }
+            if (3 < ec && ec <= 4.5) {
+                summary += "<p class='warning'><strong>Nồng độ EC khá cao:</strong>Tôm sẽ stress và giảm sức đề kháng!!</p>";
+            }
+            if (ec > 4.5) {
+                summary += "<p class='danger'><strong>Nồng độ EC rất cao:</strong> Tôm sẽ bị sốc và chết!!!</p>";
+            }
 
-    <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-      <i class="fas fa-cloud-sun text-yellow-500 text-3xl"></i>
-      <div>
-        <h2 class="text-lg font-semibold text-gray-700">Humidity</h2>
-        <p class="text-2xl font-bold text-gray-900" id="hm">%</p>
-      </div>
-    </div>
+// DO            
+            if (doValue < 3) {
+                summary += "<p class='danger'><strong>Nồng độ Oxy rất thấp: </strong>Tôm sẽ chết nếu giữ mức này!!!</p>";
+            }
+            if (3 <= doValue && doValue< 5) {
+                summary += "<p class='warning'><strong>Nồng độ Oxy khá thấp:</strong> Tôm dễ stress, chán ăn và kém phát triển!!</p>";
+            }
+            if (5 <= doValue && doValue <= 14) {
+                summary += "<p class='ideal'><strong>Nồng độ Oxy chuẩn!</strong></p>";
+            }
+            if (14 < doValue) {
+                summary += "<p class='danger'><strong>Nồng độ Oxy rất cao: </strong>vượt quá mức bão hòa tự nhiên!!!</p>";
+            }
 
-    <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-      <i class="fas fa-water-arrow-down text-indigo-500 text-3xl"></i>
-      <div>
-        <h2 class="text-lg font-semibold text-gray-700">Water Flow</h2>
-        <p class="text-2xl font-bold text-gray-900" id="wf">L/min</p>
-      </div>
-    </div>
+// NHIET DO 
+            if (temperature < 18) {
+                summary += "<p class='danger'><strong>Nhiệt độ rất thấp:</strong> Tôm sẽ chết nếu giữ mức này!!!</p>";
+            }
+            if (18 <= temperature && temperature < 28) {
+                summary += "<p class='warning'><strong>Nhiệt độ khá thấp:</strong> Tôm phát triển chậm, dễ ngạt!!</p>";
+            }
+            if (28 <= temperature && temperature <= 30) {
+                summary += "<p class='ideal'><strong>Nhiệt độ chuẩn!</strong></p>";
+            }
+            if (30 < temperature && temperature <= 33) {
+                summary += "<p class='warning'><strong>Nhiệt độ khá cao:</strong> Tôm phát triển nhanh; dễ ngạt và mắc Monodon Baculovirus!!</p>";
+            }
+            if (temperature > 33) {
+                summary += "<p class='danger'><strong>Nhiệt độ rất cao:</strong> Tôm sẽ chết nếu giữ mức này!!!</p>";
+            }
 
-    <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4 col-span-1 md:col-start-2">
-      <i class="fas fa-tachometer-alt text-pink-500 text-3xl"></i>
-      <div>
-        <h2 class="text-lg font-semibold text-gray-700">Water Level</h2>
-        <p class="text-2xl font-bold text-gray-900" id="wl">--</p>
-      </div>
-    </div>
+// PH            
+            if (ph < 6) {
+                summary += "<p class='danger'><strong>Độ Ph rất thấp:</strong> Nước quá Axit, tôm sẽ chết nếu giữ mức này!!!</p>";
+            }
+            if (6 <= ph && ph< 7.5) {
+                summary += "<p class='warning'><strong>Độ Ph khá thấp:</strong> Nước quá Axit, tôm miễn dịch yếu và dễ Stress!!</p>";
+            }
+            if (7.5 <= ph && ph <= 8.5) {
+                summary += "<p class='ideal'><strong>Độ Ph chuẩn!</strong></p>";
+            }
+            if (8.5 < ph && ph <= 9) {
+                summary += "<p class='warning'><strong>Độ Ph khá cao:</strong> Nước quá Kiềm, tôm khó trao đổi chất và dễ Stress!!</p>";
+            }
+            if (ph > 9) {
+                summary += "<p class='danger'><strong>Độ Ph rất cao:</strong> Nước quá kiềm, tôm tổn thương mô tế bào và chết!!!</p>";
+            }
 
-    <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4 col-span-1">
-      <i class="fas fa-lightbulb text-yellow-400 text-3xl"></i>
-      <div>
-        <h2 class="text-lg font-semibold text-gray-700">Light Intensity</h2>
-        <p class="text-2xl font-bold text-gray-900" id="li">lux</p>
-      </div>
-    </div>
-  </main>
+// MÀU NƯỚC 
+        switch (waterColor) {
+            case "nâu trà":
+                summary += "<p class='ideal'><strong>Màu nước nâu trà:</strong> Nước lý tưởng cho tôm nuôi!</p>";
+                break;
+            case "xanh nhạt":
+                summary += "<p class='ideal'><strong>Màu nước xanh nhạt:</strong> Tốt cho tôm, có tảo tốt cung cấp oxy!</p>";
+                break;
+            case "xanh đậm":
+                summary += "<p class='warning'><strong>Màu nước xanh đậm:</strong> Có thể có vi khuẩn lam, cần kiểm tra mức oxy và chất độc!!</p>";
+                break;
+            case "vàng cam":
+                summary += "<p class='warning'><strong>Màu nước vàng cam:</strong> Do đất phèn, cần kiểm tra chất lượng nước!!</p>";
+                break;
+            case "đỏ gạch":
+                summary += "<p class='warning'><strong>Màu nước đỏ gạch:</strong> Có thể do xói mòn đất, kiểm tra nguồn nước đầu vào!!</p>";
+                break;
+            case "đen":
+                summary += "<p class='danger'><strong>Màu nước đen:</strong> Có dấu hiệu ô nhiễm nặng, cần xử lý ngay!!!</p>";
+                break;
+            case "trắng đục":
+                summary += "<p class='warning'><strong>Màu nước trắng đục:</strong> Có thể do vi sinh vật phát triển quá mức, cần kiểm tra chất lượng nước!!</p>";
+                break;
+            case "trong":
+                summary += "<p class='warning'><strong>Màu nước trong:</strong> Có thể do thiếu dinh dưỡng hoặc sinh vật, cần kiểm tra thêm!!</p>";
+                break;
+            default:
+                summary += "<p class='black'><strong>Chưa có thông tin về màu nước!</strong></p>";
+                break;
+        }
+
+// CHECK ICON
+            if (7.5 <= ph && ph <= 8.5 && 28 <= temperature && temperature <= 30 && 5 <= doValue && doValue <= 14 && 800 <= tds && tds <= 2000 && 1000 <= ec && ec <= 3000) {
+                if (waterColor=="nâu trà" || waterColor=="xanh nhạt")
+                {
+                 colorClass = 'ideal'
+                 icon = '&#9989;';
+                }else {
+                colorClass = 'danger'
+                icon = '&#9888;'
+                }
+            } else {
+                colorClass = 'danger'
+                icon = '&#9888;'
+            }
+
+// CHECK GIẢI PHÁP
+            summary += "<p class='black'><strong>GIẢI PHÁP:</strong></p>";
+            if (800 > tds) {
+                summary += "<p class='black'>Để tăng TDS: Thêm muối khoáng hoặc thêm nước có độ TDS cao hơn.</p>";
+            }
+            if (tds > 2000) {
+                summary += "<p class='black'>Để giảm TDS: Thay nước sạch trong hồ, kết hợp lọc nước và giảm lượng thức ăn.</p>";
+            }
+            
+            if (1 > ec) {
+                summary += "<p class='black'>Để tăng EC: Thêm các dung dịch điện giải có chứa ion như Kali hoặc Natri.</p>";
+            }
+            if (ec > 3) {
+                summary += "<p class='black'>Để giảm EC: Làm sạch nước trong hồ.</p>";
+            }     
+            
+            if (5 > doValue) {
+                summary += "<p class='black'>Để tăng DO: Dùng máy sục Oxy, cải thiện lưu thông nước hoặc thay nước.</p>";
+            }
+            if (doValue > 14) {
+                summary += "<p class='black'>Để giảm DO: Giảm thời gian sử dụng máy sục Oxy, kiểm soát nhiệt độ.</p>";
+            }
+
+            if (28 > temperature) {
+                summary += "<p class='black'>Để tăng nhiệt độ: Sử dụng hệ thống sưởi và tránh thay nước thường xuyên.</p>";
+            }
+            if (temperature > 30) {
+                summary += "<p class='black'>Để giảm nhiệt độ: Sử dụng hệ thống làm mát hoặc thay bằng nước mát hơn.</p>";
+            } 
+
+            if (7.5 > ph) {
+                summary += "<p class='black'>Để tăng Ph: Thêm ba-zơ như natri carbonate hoặc canxi carbonate.</p>";
+            }   
+            if (ph > 8.5) {
+                summary += "<p class='black'>Để giảm Ph: Thêm axit như axit nitric hoặc axit sulfuric.</p>";
+            }   
+
+            switch (waterColor) {
+            case "xanh đậm":
+                summary += "<p class='black'>Cần kiểm soát tảo, thay nước và sử dụng hệ thống lọc.</p>";
+                break;
+            case "vàng cam":
+                summary += "<p class='black'>Kiểm tra nguồn nước, rắc thêm bột vôi để tránh giảm Ph đột ngột khi trời mưa.</p>";
+                break;
+            case "đỏ gạch":
+                summary += "<p class='black'>Cấp nước vào ao lắng để xử lí, đồng thời lọc nước.</p>";
+                break;
+            case "đen":
+                summary += "<p class='black'>Dùng chế phẩm Bio Active, lọc và thay nước kết hợp quạt đảo.</p>";
+                break;
+            case "trắng đục":
+                summary += "<p class='black'>Dùng hệ thống lọc mịn, chất kết tủa, vi sinh, giảm lượng thức ăn và thay nước.</p>";
+                break;
+            case "trong":
+                summary += "<p class='black'>Thay nước, tránh lạm dụng hóa chất làm chết tảo.</p>";
+                break;
+        }         
+
+            document.getElementById('inputContainer').style.display = 'none';
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('summary').innerHTML = `<div class="icon ${colorClass}">${icon}</div><div class="${colorClass}">${summary}</div>`;
+        }
+
+        function goBack() {
+            document.getElementById('inputContainer').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+        }
+    </script>
 </body>
 </html>

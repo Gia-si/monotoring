@@ -25,189 +25,187 @@
   <header class="mb-8">
     <h1 class="text-3xl font-semibold text-gray-800">Environmental Condition - Điều Kiện Môi Trường</h1>
   </header>
-<!--invisible checkbox-->
-  <input type = "checkbox" id = "phCheckbox" style = "display:none;">
-  <input type = "checkbox" id = "doCheckbox" style = "display:none;">
-  <input type = "checkbox" id = "ecCheckbox" style = "display:none;">
-  <input type = "checkbox" id = "atCheckbox" style = "display:none;">
-  <input type = "checkbox" id = "wtCheckbox" style = "display:none;">
-  <input type = "checkbox" id = "hmCheckbox" style = "display:none;">
-  <input type = "checkbox" id = "wfCheckbox" style = "display:none;">
-  <input type = "checkbox" id = "wlCheckbox" style = "display:none;">
-  <input type = "checkbox" id = "tdsCheckbox" style = "display:none;">
+
+  <!-- Invisible checkboxes (nếu cần dùng logic riêng) -->
+  <input type="checkbox" id="phCheckbox" style="display:none;">
+  <input type="checkbox" id="doCheckbox" style="display:none;">
+  <input type="checkbox" id="ecCheckbox" style="display:none;">
+  <input type="checkbox" id="atCheckbox" style="display:none;">
+  <input type="checkbox" id="wtCheckbox" style="display:none;">
+  <input type="checkbox" id="hmCheckbox" style="display:none;">
+  <input type="checkbox" id="wfCheckbox" style="display:none;">
+  <input type="checkbox" id="wlCheckbox" style="display:none;">
+  <input type="checkbox" id="tdsCheckbox" style="display:none;">
   <input type="checkbox" id="liCheckbox" style="display:none;">
 
-  <script>
-    const eraWidget = new eraWidget();
-    let configPh = null;
-    let configDo = null;
-    let configEc = null;
-    let configAt = null;
-    let configWt = null;
-    let configHm = null;
-    let configTds = null;
-    let configWf = null;
-    let configWl = null;
-    let configLi = null;
+  <script src="https://unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
+ <script>
+  const eraWidget = new EraWidget();
 
-    eraWidget.onConfiguration(
-        (configuration) => {
-        configEc = configuration.realtime_configs.find(config => config.name === "EC")
-        configTds = configuration.realtime_configs.find(config => config.name === "TDS")
-        configDo = configuration.realtime_configs.find(config => config.name === "DO")
-        configAt = configuration.realtime_configs.find(config => config.name === "AT")
-        configWt = configuration.realtime_configs.find(config => config.name === "WT")
-        configPh = configuration.realtime_configs.find(config => config.name === "PH")
-        configLi = configuration.realtime_configs.find(config => config.name === "LI")
-        configHm = configuration.realtime_configs.find(config => config.name ==="HM")
-    })
-    eraWidget.onValues(
-        (values) => {
-        if (configEc && values[configEc.id]) {
-            const ecValue = values[configEc.id].value;
-            document.getElementById('ecCheckbox').checked = ecValue > 0;
-            document.getElementById('ec').innerText = ecValue;
-        }
-        if (configTds && values[configTds.id]) {
-            const tdsValue = values[configTds.id].value;
-            document.getElementById('tdsCheckbox').checked = tdsValue > 0;
-            document.getElementById('tds').innerText = tdsValue;
-        }
-        if (configDo && values[configDo.id]) {
-            const doValue = values[configDo.id].value;
-            document.getElementById('doCheckbox').checked = doValue > 0;
-            document.getElementById('do').innerText = doValue;
-        }
-        if (configAt && values[configAt.id]) {
-            const atValue = values[configAt.id].value;
-            document.getElementById('atCheckbox').checked = atValue > 0;
-            document.getElementById('airtemp').innerText = atValue;
-        }
-        if (configWt && values[configWt.id]) {
-            const wtValue = values[configWt.id].value;
-            document.getElementById('wtCheckbox').checked = wtValue > 0;
-            document.getElementById('watertemp').innerText = wtValue;
-        }
-        if (configPh && values[configPh.id]) {
-            const phValue = values[configPh.id].value;
-            document.getElementById('phCheckbox').checked = phValue > 0;
-            document.getElementById('ph').value = innerText;
-        }
-        if (configLi && values[configLi.id]) {
-            const liValue = values[configLi.id].value;
-            document.getElementById('liCheckbox').checked = liValue > 0;
-            document.getElementById('light').innerText = liValue;
-}
-        if (configHm && values[configHm.id]) {
-            const hmValue = values[configHm.id].value;
-            document.getElementById('hmCheckbox').checked = hmValue > 0;
-            document.getElementById('hm').innerText = hmValue;
-        }
-        if (configLi && values[configLi.id]) {
-            const liValue = values[configLi.id].value;
-            document.getElementById('liCheckbox').checked = liValue > 0;
-            document.getElementById('li').innerText = liValue;
-}
+  let configPh = null;
+  let configDo = null;
+  let configEc = null;
+  let configAt = null;
+  let configWt = null;
+  let configHm = null;
+  let configTds = null;
+  let configWf = null;
+  let configWl = null;
+  let configLi = null;
 
-    })
+  eraWidget.onConfiguration((configuration) => {
+    configPh = configuration.realtime_configs.find(config => config.name === 'V0');
+    configDo = configuration.realtime_configs.find(config => config.name === 'DO');
+    configEc = configuration.realtime_configs.find(config => config.name === 'EC');
+    configWt = configuration.realtime_configs.find(config => config.name === 'TO');
+    configTds = configuration.realtime_configs.find(config => config.name === 'TDS');
+    configLi = configuration.realtime_configs.find(config => config.name === 'LUX');
+    configAt = configuration.realtime_configs.find(config => config.name === 'TEMP');
+    configHm = configuration.realtime_configs.find(config => config.name === 'HUMID');
+    configWf = configuration.realtime_configs.find(config => config.name === 'WF');
+    configWl = configuration.realtime_configs.find(config => config.name === 'WL');
+  });
 
+  eraWidget.onValues((values) => {
+    if (configPh && values[configPh.id]) {
+      const phValue = values[configPh.id].value;
+      document.getElementById('phCheckbox').checked = phValue > 0;
+      document.getElementById('ph').textContent = phValue.toFixed(2);
+    }
 
-  </script>
+    if (configDo && values[configDo.id]) {
+      const doValue = values[configDo.id].value;
+      document.getElementById('doCheckbox').checked = doValue > 0;
+      document.getElementById('do').textContent = doValue.toFixed(2);
+    }
 
-  <!-- Grid layout -->
+    if (configEc && values[configEc.id]) {
+      const ecValue = values[configEc.id].value;
+      document.getElementById('ecCheckbox').checked = ecValue > 0;
+      document.getElementById('ec').textContent = ecValue.toFixed(2);
+    }
+    if (configWt && values[configWt.id]) {
+      const wtValue = values[configWt.id].value;
+      document.getElementById('wtCheckbox').checked = wtValue > 0;
+      document.getElementById('watertemp').textContent = wtValue.toFixed(2);
+    }
+    if (configTds && values[configTds.id]) {
+      const tdsValue = values[configTds.id].value;
+      document.getElementById('tdsCheckbox').checked = tdsValue > 0;
+      document.getElementById('tds').textContent = tdsValue.toFixed(2);
+    }
+    if (configLi && values[configLi.id]) {
+      const liValue = values[configLi.id].value;
+      document.getElementById('liCheckbox').checked = liValue > 0;
+      document.getElementById('li').textContent = liValue.toFixed(2);
+    }
+    if (configAt && values[configAt.id]) {
+      const atValue = values[configAt.id].value;
+      document.getElementById('atCheckbox').checked = atValue > 0;
+      document.getElementById('airtemp').textContent = atValue.toFixed(2);
+    }
+    if (configHm && values[configHm.id]) {
+      const hmValue = values[configHm.id].value;
+      document.getElementById('hmCheckbox').checked = hmValue > 0;
+      document.getElementById('hm').textContent = hmValue.toFixed(2);
+    }
+    if (configWf && values[configWf.id]) {
+      const wfValue = values[configWf.id].value;
+      document.getElementById('wfCheckbox').checked = wfValue > 0;
+      document.getElementById('wf').textContent = wfValue.toFixed(2);
+    }
+    if (configWl && values[configWl.id]) {
+      const wlValue = values[configWl.id].value;
+      document.getElementById('wlCheckbox').checked = wlValue > 0;
+      document.getElementById('wl').textContent = wlValue.toFixed(2);
+    }
+  });
+  eraWidget.ready();
+</script>
+
+  <!-- Dashboard layout -->
   <main class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
-    <!-- 1 -->
+
+    <!-- Mỗi card -->
     <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
       <i class="fas fa-tint text-blue-500 text-3xl"></i>
       <div>
         <h2 class="text-lg font-semibold text-gray-700">pH</h2>
-        <p class="text-2xl font-bold text-gray-900" id = "ph" ></p>
+        <p class="text-2xl font-bold text-gray-900" id="ph"></p>
       </div>
     </div>
 
-    <!-- 2 -->
     <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
       <i class="fas fa-wind text-green-500 text-3xl"></i>
       <div>
         <h2 class="text-lg font-semibold text-gray-700">DO (Dissolved Oxygen)</h2>
-        <p class="text-2xl font-bold text-gray-900" id = "do"> mg/L</p>
+        <p class="text-2xl font-bold text-gray-900" id="do">mg/L</p>
       </div>
     </div>
 
-    <!-- 3 -->
     <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
       <i class="fas fa-flask text-purple-500 text-3xl"></i>
       <div>
         <h2 class="text-lg font-semibold text-gray-700">EC</h2>
-        <p class="text-2xl font-bold text-gray-900" id = "ec"> µS/cm</p>
+        <p class="text-2xl font-bold text-gray-900" id="ec">µS/cm</p>
       </div>
     </div>
 
-    <!-- 4 -->
     <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
       <i class="fas fa-water text-teal-500 text-3xl"></i>
       <div>
         <h2 class="text-lg font-semibold text-gray-700">TDS</h2>
-        <p class="text-2xl font-bold text-gray-900" id = "tds"> ppm</p>
+        <p class="text-2xl font-bold text-gray-900" id="tds">ppm</p>
       </div>
     </div>
 
-    <!-- 5 -->
     <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
       <i class="fas fa-thermometer-half text-red-500 text-3xl"></i>
       <div>
         <h2 class="text-lg font-semibold text-gray-700">Air Temperature</h2>
-        <p class="text-2xl font-bold text-gray-900" id = "airtemp"> °C</p>
+        <p class="text-2xl font-bold text-gray-900" id="airtemp">°C</p>
       </div>
     </div>
 
-    <!-- Nhiệt độ nước -->
     <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
       <i class="fas fa-thermometer-three-quarters text-cyan-500 text-3xl"></i>
       <div>
         <h2 class="text-lg font-semibold text-gray-700">Water Temperature</h2>
-        <p class="text-2xl font-bold text-gray-900" id = "watertemp"> °C</p>
+        <p class="text-2xl font-bold text-gray-900" id="watertemp">°C</p>
       </div>
     </div>
 
-    <!-- 7 -->
     <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
       <i class="fas fa-cloud-sun text-yellow-500 text-3xl"></i>
       <div>
         <h2 class="text-lg font-semibold text-gray-700">Humidity</h2>
-        <p class="text-2xl font-bold text-gray-900" id = "hm">%</p>
+        <p class="text-2xl font-bold text-gray-900" id="hm">%</p>
       </div>
     </div>
 
-    <!-- 8 -->
     <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
       <i class="fas fa-water-arrow-down text-indigo-500 text-3xl"></i>
       <div>
         <h2 class="text-lg font-semibold text-gray-700">Water Flow</h2>
-        <p class="text-2xl font-bold text-gray-900" > L/min</p>
+        <p class="text-2xl font-bold text-gray-900" id="wf">L/min</p>
       </div>
     </div>
 
-    <!--  Water Level -->
     <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4 col-span-1 md:col-start-2">
       <i class="fas fa-tachometer-alt text-pink-500 text-3xl"></i>
       <div>
         <h2 class="text-lg font-semibold text-gray-700">Water Level</h2>
-        <p class="text-2xl font-bold text-gray-900">High</p>
+        <p class="text-2xl font-bold text-gray-900" id="wl">--</p>
       </div>
     </div>
-    <!-- Light Intensity -->
+
     <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4 col-span-1">
-     <i class="fas fa-lightbulb text-yellow-400 text-3xl"></i>
-     <div>
+      <i class="fas fa-lightbulb text-yellow-400 text-3xl"></i>
+      <div>
         <h2 class="text-lg font-semibold text-gray-700">Light Intensity</h2>
         <p class="text-2xl font-bold text-gray-900" id="li">lux</p>
+      </div>
     </div>
-</div>
   </main>
-<script>
-  const myPhValue = 10; 
-  document.getElementById("ph").innerText = myPhValue + ; 
-</script>
 </body>
 </html>

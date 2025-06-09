@@ -52,62 +52,61 @@
 
     eraWidget.onConfiguration(
         (configuration) => {
-        configEc = configuration.realtime_configs.find(config => config.name == "EC")
-        configTds = configuration.realtime_configs.find(config => config.name == "TDS")
-        configDo = configuration.realtime_configs.find(config => config.name == "DO")
-        configAt = configuration.realtime_configs.find(config => config.name == "AT")
-        configWt = configuration.realtime_configs.find(config => config.name == "WT")
-        configPh = configuration.realtime_configs.find(config => config.name == "PH")
-        configLi = configuration.realtime_configs.find(config => config.name == "LI")
-        configHm = configuration.realtime_configs.find(config => config.name == "HM")
-        configLi = configuration.realtime_configs.find(config => config.name = "LI" )
+        configEc = configuration.realtime_configs.find(config => config.name === "EC")
+        configTds = configuration.realtime_configs.find(config => config.name === "TDS")
+        configDo = configuration.realtime_configs.find(config => config.name === "DO")
+        configAt = configuration.realtime_configs.find(config => config.name === "AT")
+        configWt = configuration.realtime_configs.find(config => config.name === "WT")
+        configPh = configuration.realtime_configs.find(config => config.name === "PH")
+        configLi = configuration.realtime_configs.find(config => config.name === "LI")
+        configHm = configuration.realtime_configs.find(config => config.name ==="HM")
     })
     eraWidget.onValues(
         (values) => {
         if (configEc && values[configEc.id]) {
             const ecValue = values[configEc.id].value;
             document.getElementById('ecCheckbox').checked = ecValue > 0;
-            document.getElementById('ec').value = ecValue;
+            document.getElementById('ec').innerText = ecValue;
         }
         if (configTds && values[configTds.id]) {
             const tdsValue = values[configTds.id].value;
             document.getElementById('tdsCheckbox').checked = tdsValue > 0;
-            document.getElementById('tds').value = tdsValue;
+            document.getElementById('tds').innerText = tdsValue;
         }
         if (configDo && values[configDo.id]) {
             const doValue = values[configDo.id].value;
             document.getElementById('doCheckbox').checked = doValue > 0;
-            document.getElementById('do').value = doValue;
+            document.getElementById('do').innerText = doValue;
         }
         if (configAt && values[configAt.id]) {
             const atValue = values[configAt.id].value;
             document.getElementById('atCheckbox').checked = atValue > 0;
-            document.getElementById('airtemp').value = atValue;
+            document.getElementById('airtemp').innerText = atValue;
         }
         if (configWt && values[configWt.id]) {
             const wtValue = values[configWt.id].value;
             document.getElementById('wtCheckbox').checked = wtValue > 0;
-            document.getElementById('watertemp').value = wtValue;
+            document.getElementById('watertemp').innerText = wtValue;
         }
         if (configPh && values[configPh.id]) {
             const phValue = values[configPh.id].value;
             document.getElementById('phCheckbox').checked = phValue > 0;
-            document.getElementById('ph').value = phValue;
+            document.getElementById('ph').value = innerText;
         }
         if (configLi && values[configLi.id]) {
             const liValue = values[configLi.id].value;
             document.getElementById('liCheckbox').checked = liValue > 0;
-            document.getElementById('light').value = liValue;
+            document.getElementById('light').innerText = liValue;
 }
         if (configHm && values[configHm.id]) {
             const hmValue = values[configHm.id].value;
             document.getElementById('hmCheckbox').checked = hmValue > 0;
-            document.getElementById('hm').value = hmValue;
+            document.getElementById('hm').innerText = hmValue;
         }
         if (configLi && values[configLi.id]) {
             const liValue = values[configLi.id].value;
             document.getElementById('liCheckbox').checked = liValue > 0;
-            document.getElementById('li').value = liValue;
+            document.getElementById('li').innerText = liValue;
 }
 
     })
@@ -122,7 +121,7 @@
       <i class="fas fa-tint text-blue-500 text-3xl"></i>
       <div>
         <h2 class="text-lg font-semibold text-gray-700">pH</h2>
-        <p class="text-2xl font-bold text-gray-900" id = "ph" placeholder = "0"></p>
+        <p class="text-2xl font-bold text-gray-900" id = "ph" ></p>
       </div>
     </div>
 
@@ -206,5 +205,9 @@
     </div>
 </div>
   </main>
+<script>
+  const myPhValue = 10; 
+  document.getElementById("ph").innerText = myPhValue + ; 
+</script>
 </body>
 </html>

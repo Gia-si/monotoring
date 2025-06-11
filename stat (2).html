@@ -39,99 +39,54 @@
 
 <script src="https://www.unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
 
-<script>
-  const eraWidget = new EraWidget();
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const eraWidget = new EraWidget();
 
-  let configPh = null;
-  let configDo = null;
-  let configEc = null;
-  let configAt = null;
-  let configWt = null;
-  let configHm = null;
-  let configTds = null;
-  let configWf = null;
-  let configWl = null;
-  let configLi = null;
+      let configPh = null, configDo = null, configEc = null, configAt = null,
+          configWt = null, configHm = null, configTds = null,
+          configWf = null, configWl = null, configLi = null;
 
-  eraWidget.init({
-    onConfiguration: (configuration) => {
-      configPh  = configuration.realtime_configs.find(config => config.name === 'PH');
-      configDo  = configuration.realtime_configs.find(config => config.name === 'DO');
-      configEc  = configuration.realtime_configs.find(config => config.name === 'EC');
-      configWt  = configuration.realtime_configs.find(config => config.name === 'TO');
-      configTds = configuration.realtime_configs.find(config => config.name === 'TDS');
-      configLi  = configuration.realtime_configs.find(config => config.name === 'LUX');
-      configAt  = configuration.realtime_configs.find(config => config.name === 'TEMP');
-      configHm  = configuration.realtime_configs.find(config => config.name === 'HUMID');
-      configWf  = configuration.realtime_configs.find(config => config.name === 'WF');
-      configWl  = configuration.realtime_configs.find(config => config.name === 'WL');
-    },
+      eraWidget.init({
+        onConfiguration: (configuration) => {
+          configPh  = configuration.realtime_configs.find(cfg => cfg.name === 'PH');
+          configDo  = configuration.realtime_configs.find(cfg => cfg.name === 'DO');
+          configEc  = configuration.realtime_configs.find(cfg => cfg.name === 'EC');
+          configWt  = configuration.realtime_configs.find(cfg => cfg.name === 'TO');
+          configTds = configuration.realtime_configs.find(cfg => cfg.name === 'TDS');
+          configLi  = configuration.realtime_configs.find(cfg => cfg.name === 'LUX');
+          configAt  = configuration.realtime_configs.find(cfg => cfg.name === 'TEMP');
+          configHm  = configuration.realtime_configs.find(cfg => cfg.name === 'HUMID');
+          configWf  = configuration.realtime_configs.find(cfg => cfg.name === 'WF');
+          configWl  = configuration.realtime_configs.find(cfg => cfg.name === 'WL');
+        },
 
-    onValues: (values) => {
-      if (configPh && values[configPh.id]) {
-        const phValue = values[configPh.id].value;
-        document.getElementById('phCheckbox').checked = phValue > 0;
-        document.getElementById('ph').innerText = phValue.toFixed(2);
-      }
+        onValues: (values) => {
+          const updateUI = (config, id, checkboxId) => {
+            if (config && values[config.id]) {
+              const val = values[config.id].value;
+              document.getElementById(id).innerText = val.toFixed(2);
+              document.getElementById(checkboxId).checked = val > 0;
+            }
+          };
 
-      if (configDo && values[configDo.id]) {
-        const doValue = values[configDo.id].value;
-        document.getElementById('doCheckbox').checked = doValue > 0;
-        document.getElementById('do').innerText = doValue.toFixed(2);
-      }
+          updateUI(configPh,  'ph',        'phCheckbox');
+          updateUI(configDo,  'do',        'doCheckbox');
+          updateUI(configEc,  'ec',        'ecCheckbox');
+          updateUI(configWt,  'watertemp', 'wtCheckbox');
+          updateUI(configTds, 'tds',       'tdsCheckbox');
+          updateUI(configLi,  'li',        'liCheckbox');
+          updateUI(configAt,  'airtemp',   'atCheckbox');
+          updateUI(configHm,  'hm',        'hmCheckbox');
+          updateUI(configWf,  'wf',        'wfCheckbox');
+          updateUI(configWl,  'wl',        'wlCheckbox');
+        },
+      });
 
-      if (configEc && values[configEc.id]) {
-        const ecValue = values[configEc.id].value;
-        document.getElementById('ecCheckbox').checked = ecValue > 0;
-        document.getElementById('ec').innerText = ecValue.toFixed(2);
-      }
-
-      if (configWt && values[configWt.id]) {
-        const wtValue = values[configWt.id].value;
-        document.getElementById('wtCheckbox').checked = wtValue > 0;
-        document.getElementById('watertemp').innerText = wtValue.toFixed(2);
-      }
-
-      if (configTds && values[configTds.id]) {
-        const tdsValue = values[configTds.id].value;
-        document.getElementById('tdsCheckbox').checked = tdsValue > 0;
-        document.getElementById('tds').innerText = tdsValue.toFixed(2);
-      }
-
-      if (configLi && values[configLi.id]) {
-        const liValue = values[configLi.id].value;
-        document.getElementById('liCheckbox').checked = liValue > 0;
-        document.getElementById('li').innerText = liValue.toFixed(2);
-      }
-
-      if (configAt && values[configAt.id]) {
-        const atValue = values[configAt.id].value;
-        document.getElementById('atCheckbox').checked = atValue > 0;
-        document.getElementById('airtemp').innerText = atValue.toFixed(2);
-      }
-
-      if (configHm && values[configHm.id]) {
-        const hmValue = values[configHm.id].value;
-        document.getElementById('hmCheckbox').checked = hmValue > 0;
-        document.getElementById('hm').innerText = hmValue.toFixed(2);
-      }
-
-      if (configWf && values[configWf.id]) {
-        const wfValue = values[configWf.id].value;
-        document.getElementById('wfCheckbox').checked = wfValue > 0;
-        document.getElementById('wf').innerText = wfValue.toFixed(2);
-      }
-
-      if (configWl && values[configWl.id]) {
-        const wlValue = values[configWl.id].value;
-        document.getElementById('wlCheckbox').checked = wlValue > 0;
-        document.getElementById('wl').innerText = wlValue.toFixed(2);
-      }
-    },
-  });
-
-  eraWidget.ready();
-</script>
+      // Đảm bảo gọi sau khi DOM và widget sẵn sàng
+      eraWidget.ready();
+    });
+  </script>
 
   <!-- Dashboard layout -->
   <main class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">

@@ -66,84 +66,88 @@
     </div>
   </nav>
 
-  <!-- Dashboard layout -->
-  <main class="grid grid-cols-1 sm:grid-cols-2 gap-8 w-full max-w-4xl">
-
-    <!-- Light Intensity Card -->
-    <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center">
-      <div class="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full p-4 mb-4 icon-glow pulse-animation">
-        <i class="fas fa-lightbulb text-white text-3xl"></i>
+  <!-- Dashboard layout - Symmetric 2x2 -->
+  <main class="w-full max-w-4xl">
+    <!-- First row - 2 cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+      <!-- Light Intensity Card -->
+      <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center">
+        <div class="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full p-4 mb-4 icon-glow pulse-animation">
+          <i class="fas fa-lightbulb text-white text-3xl"></i>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-700 mb-2">Light Intensity</h2>
+        <p class="text-4xl font-bold text-yellow-600 mb-2" id="li">--</p>
+        <span class="text-sm text-gray-500 bg-yellow-50 px-3 py-1 rounded-full">lux</span>
+        <div class="mt-3 w-full bg-gray-200 rounded-full h-2">
+          <div class="bg-gradient-to-r from-yellow-400 to-orange-500 h-2 rounded-full" style="width: 0%"></div>
+        </div>
       </div>
-      <h2 class="text-xl font-semibold text-gray-700 mb-2">Light Intensity</h2>
-      <p class="text-4xl font-bold text-yellow-600 mb-2" id="li">2,450</p>
-      <span class="text-sm text-gray-500 bg-yellow-50 px-3 py-1 rounded-full">lux</span>
-      <div class="mt-3 w-full bg-gray-200 rounded-full h-2">
-        <div class="bg-gradient-to-r from-yellow-400 to-orange-500 h-2 rounded-full" style="width: 70%"></div>
+
+      <!-- Water Level Card -->
+      <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center">
+        <div class="bg-gradient-to-br from-blue-400 to-indigo-600 rounded-full p-4 mb-4 icon-glow">
+          <i class="fas fa-tachometer-alt text-white text-3xl"></i>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-700 mb-2">Water Level</h2>
+        <p class="text-4xl font-bold text-indigo-600 mb-2" id="wl">--</p>
+        <span class="text-sm text-gray-500 bg-indigo-50 px-3 py-1 rounded-full">cm</span>
+        <div class="mt-3 w-full bg-gray-200 rounded-full h-2">
+          <div class="bg-gradient-to-r from-blue-400 to-indigo-600 h-2 rounded-full" style="width: 0%"></div>
+        </div>
       </div>
     </div>
 
-    <!-- Water Level Card -->
-    <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center">
-      <div class="bg-gradient-to-br from-blue-400 to-indigo-600 rounded-full p-4 mb-4 icon-glow">
-        <i class="fas fa-tachometer-alt text-white text-3xl"></i>
+    <!-- Second row - 2 cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+      <!-- Humidity Card -->
+      <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center">
+        <div class="bg-gradient-to-br from-green-400 to-emerald-600 rounded-full p-4 mb-4 icon-glow">
+          <i class="fas fa-droplet text-white text-3xl"></i>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-700 mb-2">Humidity</h2>
+        <p class="text-4xl font-bold text-emerald-600 mb-2" id="hm">--</p>
+        <span class="text-sm text-gray-500 bg-emerald-50 px-3 py-1 rounded-full">%</span>
+        <div class="mt-3 w-full bg-gray-200 rounded-full h-2">
+          <div class="bg-gradient-to-r from-green-400 to-emerald-600 h-2 rounded-full" style="width: 0%"></div>
+        </div>
       </div>
-      <h2 class="text-xl font-semibold text-gray-700 mb-2">Water Level</h2>
-      <p class="text-4xl font-bold text-indigo-600 mb-2" id="wl">85.7</p>
-      <span class="text-sm text-gray-500 bg-indigo-50 px-3 py-1 rounded-full">cm</span>
-      <div class="mt-3 w-full bg-gray-200 rounded-full h-2">
-        <div class="bg-gradient-to-r from-blue-400 to-indigo-600 h-2 rounded-full" style="width: 85%"></div>
+
+      <!-- Air Temperature Card -->
+      <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center">
+        <div class="bg-gradient-to-br from-red-400 to-pink-600 rounded-full p-4 mb-4 icon-glow">
+          <i class="fas fa-thermometer-half text-white text-3xl"></i>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-700 mb-2">Air Temperature</h2>
+        <p class="text-4xl font-bold text-red-600 mb-2" id="airtemp">--</p>
+        <span class="text-sm text-gray-500 bg-red-50 px-3 py-1 rounded-full">°C</span>
+        <div class="mt-3 w-full bg-gray-200 rounded-full h-2">
+          <div class="bg-gradient-to-r from-red-400 to-pink-600 h-2 rounded-full" style="width: 0%"></div>
+        </div>
       </div>
     </div>
-
-    <!-- Humidity Card -->
-    <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center">
-      <div class="bg-gradient-to-br from-green-400 to-emerald-600 rounded-full p-4 mb-4 icon-glow">
-        <i class="fas fa-droplet text-white text-3xl"></i>
-      </div>
-      <h2 class="text-xl font-semibold text-gray-700 mb-2">Humidity</h2>
-      <p class="text-4xl font-bold text-emerald-600 mb-2" id="hm">68.3</p>
-      <span class="text-sm text-gray-500 bg-emerald-50 px-3 py-1 rounded-full">%</span>
-      <div class="mt-3 w-full bg-gray-200 rounded-full h-2">
-        <div class="bg-gradient-to-r from-green-400 to-emerald-600 h-2 rounded-full" style="width: 68%"></div>
-      </div>
-    </div>
-
-    <!-- Air Temperature Card -->
-    <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center">
-      <div class="bg-gradient-to-br from-red-400 to-pink-600 rounded-full p-4 mb-4 icon-glow">
-        <i class="fas fa-thermometer-half text-white text-3xl"></i>
-      </div>
-      <h2 class="text-xl font-semibold text-gray-700 mb-2">Air Temperature</h2>
-      <p class="text-4xl font-bold text-red-600 mb-2" id="airtemp">26.4</p>
-      <span class="text-sm text-gray-500 bg-red-50 px-3 py-1 rounded-full">°C</span>
-      <div class="mt-3 w-full bg-gray-200 rounded-full h-2">
-        <div class="bg-gradient-to-r from-red-400 to-pink-600 h-2 rounded-full" style="width: 60%"></div>
-      </div>
-    </div>
-
   </main>
 
   <!-- Status Indicators -->
   <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-4xl">
     <div class="glass-card rounded-xl p-4 text-center">
-      <div class="w-3 h-3 bg-green-500 rounded-full mx-auto mb-2 pulse-animation"></div>
+      <div class="w-3 h-3 bg-gray-400 rounded-full mx-auto mb-2"></div>
       <p class="text-sm font-medium text-gray-700">Light System</p>
-      <p class="text-xs text-gray-500">Online</p>
+      <p class="text-xs text-gray-500">Offline</p>
     </div>
     <div class="glass-card rounded-xl p-4 text-center">
-      <div class="w-3 h-3 bg-blue-500 rounded-full mx-auto mb-2 pulse-animation"></div>
+      <div class="w-3 h-3 bg-gray-400 rounded-full mx-auto mb-2"></div>
       <p class="text-sm font-medium text-gray-700">Level Sensor</p>
-      <p class="text-xs text-gray-500">Active</p>
+      <p class="text-xs text-gray-500">Inactive</p>
     </div>
     <div class="glass-card rounded-xl p-4 text-center">
-      <div class="w-3 h-3 bg-green-500 rounded-full mx-auto mb-2 pulse-animation"></div>
+      <div class="w-3 h-3 bg-gray-400 rounded-full mx-auto mb-2"></div>
       <p class="text-sm font-medium text-gray-700">Humidity Sensor</p>
-      <p class="text-xs text-gray-500">Normal</p>
+      <p class="text-xs text-gray-500">Offline</p>
     </div>
     <div class="glass-card rounded-xl p-4 text-center">
-      <div class="w-3 h-3 bg-orange-500 rounded-full mx-auto mb-2 pulse-animation"></div>
+      <div class="w-3 h-3 bg-gray-400 rounded-full mx-auto mb-2"></div>
       <p class="text-sm font-medium text-gray-700">Temp Sensor</p>
-      <p class="text-xs text-gray-500">Warning</p>
+      <p class="text-xs text-gray-500">Offline</p>
     </div>
   </div>
 
@@ -162,36 +166,6 @@
     // Update every second
     setInterval(updateTimestamp, 1000);
     updateTimestamp();
-
-    // Simulate real-time data updates
-    function simulateDataUpdate() {
-      // Light intensity fluctuation
-      const lightElement = document.getElementById('li');
-      const currentLight = parseFloat(lightElement.textContent.replace(',', ''));
-      const newLight = currentLight + (Math.random() - 0.5) * 100;
-      lightElement.textContent = newLight.toLocaleString('en-US', {maximumFractionDigits: 0});
-
-      // Water level fluctuation
-      const waterElement = document.getElementById('wl');
-      const currentWater = parseFloat(waterElement.textContent);
-      const newWater = Math.max(0, Math.min(100, currentWater + (Math.random() - 0.5) * 2));
-      waterElement.textContent = newWater.toFixed(1);
-
-      // Humidity fluctuation
-      const humidityElement = document.getElementById('hm');
-      const currentHumidity = parseFloat(humidityElement.textContent);
-      const newHumidity = Math.max(0, Math.min(100, currentHumidity + (Math.random() - 0.5) * 3));
-      humidityElement.textContent = newHumidity.toFixed(1);
-
-      // Temperature fluctuation
-      const tempElement = document.getElementById('airtemp');
-      const currentTemp = parseFloat(tempElement.textContent);
-      const newTemp = currentTemp + (Math.random() - 0.5) * 1;
-      tempElement.textContent = newTemp.toFixed(1);
-    }
-
-    // Update data every 5 seconds
-    setInterval(simulateDataUpdate, 5000);
 
     // Add some animation on load
     window.addEventListener('load', () => {

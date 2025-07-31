@@ -59,59 +59,65 @@
     </div>
   </nav>
 
-  <!-- Dashboard layout -->
-  <main class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-5xl">
-
-    <!-- pH Card -->
-    <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center">
-      <div class="bg-gradient-to-br from-blue-400 to-blue-600 rounded-full p-4 mb-4 icon-glow">
-        <i class="fas fa-tint text-white text-3xl"></i>
+  <!-- Dashboard layout - Symmetric 2x2 + 1 centered -->
+  <main class="w-full max-w-4xl">
+    <!-- First row - 2 cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+      <!-- pH Card -->
+      <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center">
+        <div class="bg-gradient-to-br from-blue-400 to-blue-600 rounded-full p-4 mb-4 icon-glow">
+          <i class="fas fa-tint text-white text-3xl"></i>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-700 mb-2">pH Level</h2>
+        <p class="text-4xl font-bold text-blue-600 mb-2" id="ph">--</p>
+        <span class="text-sm text-gray-500 bg-blue-50 px-3 py-1 rounded-full">Optimal Range: 6.5-8.5</span>
       </div>
-      <h2 class="text-xl font-semibold text-gray-700 mb-2">pH Level</h2>
-      <p class="text-4xl font-bold text-blue-600 mb-2" id="ph">7.25</p>
-      <span class="text-sm text-gray-500 bg-blue-50 px-3 py-1 rounded-full">Optimal Range: 6.5-8.5</span>
+
+      <!-- EC Card -->
+      <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center">
+        <div class="bg-gradient-to-br from-purple-400 to-purple-600 rounded-full p-4 mb-4 icon-glow">
+          <i class="fas fa-flask text-white text-3xl"></i>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-700 mb-2">Electrical Conductivity</h2>
+        <p class="text-4xl font-bold text-purple-600 mb-2" id="ec">--</p>
+        <span class="text-sm text-gray-500 bg-purple-50 px-3 py-1 rounded-full">µS/cm</span>
+      </div>
     </div>
 
-    <!-- EC Card -->
-    <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center">
-      <div class="bg-gradient-to-br from-purple-400 to-purple-600 rounded-full p-4 mb-4 icon-glow">
-        <i class="fas fa-flask text-white text-3xl"></i>
+    <!-- Second row - 2 cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+      <!-- DO Card -->
+      <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center">
+        <div class="bg-gradient-to-br from-green-400 to-green-600 rounded-full p-4 mb-4 icon-glow">
+          <i class="fas fa-wind text-white text-3xl"></i>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-700 mb-2">Dissolved Oxygen</h2>
+        <p class="text-4xl font-bold text-green-600 mb-2" id="do">--</p>
+        <span class="text-sm text-gray-500 bg-green-50 px-3 py-1 rounded-full">mg/L</span>
       </div>
-      <h2 class="text-xl font-semibold text-gray-700 mb-2">Electrical Conductivity</h2>
-      <p class="text-4xl font-bold text-purple-600 mb-2" id="ec">1,250</p>
-      <span class="text-sm text-gray-500 bg-purple-50 px-3 py-1 rounded-full">µS/cm</span>
+
+      <!-- Water Temperature Card -->
+      <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center">
+        <div class="bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-full p-4 mb-4 icon-glow">
+          <i class="fas fa-thermometer-three-quarters text-white text-3xl"></i>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-700 mb-2">Water Temperature</h2>
+        <p class="text-4xl font-bold text-cyan-600 mb-2" id="watertemp">--</p>
+        <span class="text-sm text-gray-500 bg-cyan-50 px-3 py-1 rounded-full">°C</span>
+      </div>
     </div>
 
-    <!-- DO Card -->
-    <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center">
-      <div class="bg-gradient-to-br from-green-400 to-green-600 rounded-full p-4 mb-4 icon-glow">
-        <i class="fas fa-wind text-white text-3xl"></i>
+    <!-- Third row - 1 centered card -->
+    <div class="flex justify-center">
+      <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center w-full md:w-96">
+        <div class="bg-gradient-to-br from-teal-400 to-teal-600 rounded-full p-4 mb-4 icon-glow">
+          <i class="fas fa-water text-white text-3xl"></i>
+        </div>
+        <h2 class="text-xl font-semibold text-gray-700 mb-2">Total Dissolved Solids</h2>
+        <p class="text-4xl font-bold text-teal-600 mb-2" id="tds">--</p>
+        <span class="text-sm text-gray-500 bg-teal-50 px-3 py-1 rounded-full">ppm</span>
       </div>
-      <h2 class="text-xl font-semibold text-gray-700 mb-2">Dissolved Oxygen</h2>
-      <p class="text-4xl font-bold text-green-600 mb-2" id="do">8.45</p>
-      <span class="text-sm text-gray-500 bg-green-50 px-3 py-1 rounded-full">mg/L</span>
     </div>
-
-    <!-- Water Temperature Card -->
-    <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center">
-      <div class="bg-gradient-to-br from-cyan-400 to-cyan-600 rounded-full p-4 mb-4 icon-glow">
-        <i class="fas fa-thermometer-three-quarters text-white text-3xl"></i>
-      </div>
-      <h2 class="text-xl font-semibold text-gray-700 mb-2">Water Temperature</h2>
-      <p class="text-4xl font-bold text-cyan-600 mb-2" id="watertemp">24.8</p>
-      <span class="text-sm text-gray-500 bg-cyan-50 px-3 py-1 rounded-full">°C</span>
-    </div>
-
-    <!-- TDS Card -->
-    <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center sm:col-span-2 lg:col-span-1 lg:col-start-2">
-      <div class="bg-gradient-to-br from-teal-400 to-teal-600 rounded-full p-4 mb-4 icon-glow">
-        <i class="fas fa-water text-white text-3xl"></i>
-      </div>
-      <h2 class="text-xl font-semibold text-gray-700 mb-2">Total Dissolved Solids</h2>
-      <p class="text-4xl font-bold text-teal-600 mb-2" id="tds">750</p>
-      <span class="text-sm text-gray-500 bg-teal-50 px-3 py-1 rounded-full">ppm</span>
-    </div>
-
   </main>
 
   <!-- Footer -->

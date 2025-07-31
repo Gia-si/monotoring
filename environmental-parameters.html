@@ -11,15 +11,16 @@
     body {
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      overflow: hidden;
     }
     .parameter-card {
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: all 0.3s ease;
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
     .parameter-card:hover {
-      transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+      transform: scale(1.02);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     }
     .glass-card {
       background: rgba(255, 255, 255, 0.95);
@@ -30,157 +31,152 @@
       transition: all 0.3s ease;
     }
     .nav-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      background: rgba(255, 255, 255, 0.3);
     }
-    .icon-glow {
-      filter: drop-shadow(0 0 8px rgba(245, 87, 108, 0.3));
+    .compact-text {
+      font-size: 0.75rem;
     }
-    .pulse-animation {
-      animation: pulse 2s infinite;
+    .compact-value {
+      font-size: 1.5rem;
     }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
+    .tiny-icon {
+      font-size: 1.2rem;
+    }
+    .progress-bar {
+      height: 3px;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 2px;
+      transition: width 0.3s ease;
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-center p-6">
-  <header class="mb-10 text-center">
-    <h1 class="text-4xl font-bold text-white mb-4 drop-shadow-lg">
-      <i class="fas fa-cloud-sun text-yellow-300 mr-3"></i>
+<body class="h-screen w-screen flex flex-col p-2">
+  <!-- Compact Header -->
+  <header class="mb-2 text-center">
+    <h1 class="text-lg font-bold text-white drop-shadow-lg">
+      <i class="fas fa-cloud-sun text-yellow-300 mr-2 text-sm"></i>
       Environmental Parameters
     </h1>
-    <p class="text-pink-100 text-lg font-light">Ambient Conditions Monitoring</p>
   </header>
 
-  <!-- Navigation -->
-  <nav class="mb-8">
-    <div class="flex space-x-4">
-      <a href="water-parameters.html" class="nav-btn bg-white bg-opacity-20 px-6 py-3 rounded-full text-white font-semibold hover:bg-opacity-30">
-        <i class="fas fa-tint mr-2"></i>Water Parameters
+  <!-- Compact Navigation -->
+  <nav class="mb-3">
+    <div class="flex justify-center space-x-2">
+      <a href="water-parameters.html" class="nav-btn bg-white bg-opacity-20 px-3 py-1 rounded-full text-white font-medium compact-text hover:bg-opacity-30">
+        <i class="fas fa-tint mr-1 text-xs"></i>Water
       </a>
-      <button class="nav-btn glass-card px-6 py-3 rounded-full text-pink-600 font-semibold">
-        <i class="fas fa-cloud-sun mr-2"></i>Environmental
+      <button class="nav-btn glass-card px-3 py-1 rounded-full text-pink-600 font-medium compact-text">
+        <i class="fas fa-cloud-sun mr-1 text-xs"></i>Environmental
       </button>
     </div>
   </nav>
 
-  <!-- Dashboard layout - Symmetric 2x2 -->
-  <main class="w-full max-w-4xl">
-    <!-- First row - 2 cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-      <!-- Light Intensity Card -->
-      <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center">
-        <div class="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full p-4 mb-4 icon-glow pulse-animation">
-          <i class="fas fa-lightbulb text-white text-3xl"></i>
-        </div>
-        <h2 class="text-xl font-semibold text-gray-700 mb-2">Light Intensity</h2>
-        <p class="text-4xl font-bold text-yellow-600 mb-2" id="li">--</p>
-        <span class="text-sm text-gray-500 bg-yellow-50 px-3 py-1 rounded-full">lux</span>
-        <div class="mt-3 w-full bg-gray-200 rounded-full h-2">
-          <div class="bg-gradient-to-r from-yellow-400 to-orange-500 h-2 rounded-full" style="width: 0%"></div>
-        </div>
+  <!-- Main Dashboard - Optimized for 480x272 -->
+  <main class="flex-1 grid grid-cols-2 gap-2 h-full">
+    <!-- Light Intensity Card -->
+    <div class="parameter-card glass-card rounded-lg p-2 shadow-lg flex flex-col items-center justify-center text-center">
+      <div class="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full p-2 mb-1">
+        <i class="fas fa-lightbulb text-white tiny-icon"></i>
       </div>
-
-      <!-- Water Level Card -->
-      <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center">
-        <div class="bg-gradient-to-br from-blue-400 to-indigo-600 rounded-full p-4 mb-4 icon-glow">
-          <i class="fas fa-tachometer-alt text-white text-3xl"></i>
-        </div>
-        <h2 class="text-xl font-semibold text-gray-700 mb-2">Water Level</h2>
-        <p class="text-4xl font-bold text-indigo-600 mb-2" id="wl">--</p>
-        <span class="text-sm text-gray-500 bg-indigo-50 px-3 py-1 rounded-full">cm</span>
-        <div class="mt-3 w-full bg-gray-200 rounded-full h-2">
-          <div class="bg-gradient-to-r from-blue-400 to-indigo-600 h-2 rounded-full" style="width: 0%"></div>
-        </div>
+      <h3 class="text-xs font-semibold text-gray-700 mb-1">Light</h3>
+      <p class="compact-value font-bold text-yellow-600" id="li">--</p>
+      <span class="text-xs text-gray-500">lux</span>
+      <div class="progress-bar mt-1">
+        <div class="progress-fill bg-gradient-to-r from-yellow-400 to-orange-500" id="light-progress"></div>
       </div>
     </div>
 
-    <!-- Second row - 2 cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-      <!-- Humidity Card -->
-      <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center">
-        <div class="bg-gradient-to-br from-green-400 to-emerald-600 rounded-full p-4 mb-4 icon-glow">
-          <i class="fas fa-droplet text-white text-3xl"></i>
-        </div>
-        <h2 class="text-xl font-semibold text-gray-700 mb-2">Humidity</h2>
-        <p class="text-4xl font-bold text-emerald-600 mb-2" id="hm">--</p>
-        <span class="text-sm text-gray-500 bg-emerald-50 px-3 py-1 rounded-full">%</span>
-        <div class="mt-3 w-full bg-gray-200 rounded-full h-2">
-          <div class="bg-gradient-to-r from-green-400 to-emerald-600 h-2 rounded-full" style="width: 0%"></div>
-        </div>
+    <!-- Water Level Card -->
+    <div class="parameter-card glass-card rounded-lg p-2 shadow-lg flex flex-col items-center justify-center text-center">
+      <div class="bg-gradient-to-br from-blue-400 to-indigo-600 rounded-full p-2 mb-1">
+        <i class="fas fa-tachometer-alt text-white tiny-icon"></i>
       </div>
+      <h3 class="text-xs font-semibold text-gray-700 mb-1">Level</h3>
+      <p class="compact-value font-bold text-indigo-600" id="wl">--</p>
+      <span class="text-xs text-gray-500">cm</span>
+      <div class="progress-bar mt-1">
+        <div class="progress-fill bg-gradient-to-r from-blue-400 to-indigo-600" id="level-progress"></div>
+      </div>
+    </div>
 
-      <!-- Air Temperature Card -->
-      <div class="parameter-card glass-card rounded-2xl p-8 shadow-xl flex flex-col items-center text-center">
-        <div class="bg-gradient-to-br from-red-400 to-pink-600 rounded-full p-4 mb-4 icon-glow">
-          <i class="fas fa-thermometer-half text-white text-3xl"></i>
-        </div>
-        <h2 class="text-xl font-semibold text-gray-700 mb-2">Air Temperature</h2>
-        <p class="text-4xl font-bold text-red-600 mb-2" id="airtemp">--</p>
-        <span class="text-sm text-gray-500 bg-red-50 px-3 py-1 rounded-full">°C</span>
-        <div class="mt-3 w-full bg-gray-200 rounded-full h-2">
-          <div class="bg-gradient-to-r from-red-400 to-pink-600 h-2 rounded-full" style="width: 0%"></div>
-        </div>
+    <!-- Humidity Card -->
+    <div class="parameter-card glass-card rounded-lg p-2 shadow-lg flex flex-col items-center justify-center text-center">
+      <div class="bg-gradient-to-br from-green-400 to-emerald-600 rounded-full p-2 mb-1">
+        <i class="fas fa-droplet text-white tiny-icon"></i>
+      </div>
+      <h3 class="text-xs font-semibold text-gray-700 mb-1">Humidity</h3>
+      <p class="compact-value font-bold text-emerald-600" id="hm">--</p>
+      <span class="text-xs text-gray-500">%</span>
+      <div class="progress-bar mt-1">
+        <div class="progress-fill bg-gradient-to-r from-green-400 to-emerald-600" id="humidity-progress"></div>
+      </div>
+    </div>
+
+    <!-- Air Temperature Card -->
+    <div class="parameter-card glass-card rounded-lg p-2 shadow-lg flex flex-col items-center justify-center text-center">
+      <div class="bg-gradient-to-br from-red-400 to-pink-600 rounded-full p-2 mb-1">
+        <i class="fas fa-thermometer-half text-white tiny-icon"></i>
+      </div>
+      <h3 class="text-xs font-semibold text-gray-700 mb-1">Temp</h3>
+      <p class="compact-value font-bold text-red-600" id="airtemp">--</p>
+      <span class="text-xs text-gray-500">°C</span>
+      <div class="progress-bar mt-1">
+        <div class="progress-fill bg-gradient-to-r from-red-400 to-pink-600" id="temp-progress"></div>
       </div>
     </div>
   </main>
 
-  <!-- Status Indicators -->
-  <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-4xl">
-    <div class="glass-card rounded-xl p-4 text-center">
-      <div class="w-3 h-3 bg-gray-400 rounded-full mx-auto mb-2"></div>
-      <p class="text-sm font-medium text-gray-700">Light System</p>
-      <p class="text-xs text-gray-500">Offline</p>
+  <!-- Compact Status Bar -->
+  <footer class="mt-2 flex justify-between items-center text-xs text-white text-opacity-70">
+    <div class="flex space-x-2">
+      <div class="flex items-center">
+        <div class="w-1.5 h-1.5 bg-gray-400 rounded-full mr-1"></div>
+        <span>Sensors: Offline</span>
+      </div>
     </div>
-    <div class="glass-card rounded-xl p-4 text-center">
-      <div class="w-3 h-3 bg-gray-400 rounded-full mx-auto mb-2"></div>
-      <p class="text-sm font-medium text-gray-700">Level Sensor</p>
-      <p class="text-xs text-gray-500">Inactive</p>
+    <div>
+      <span>Update: </span>
+      <span id="lastUpdated" class="font-mono">--:--:--</span>
     </div>
-    <div class="glass-card rounded-xl p-4 text-center">
-      <div class="w-3 h-3 bg-gray-400 rounded-full mx-auto mb-2"></div>
-      <p class="text-sm font-medium text-gray-700">Humidity Sensor</p>
-      <p class="text-xs text-gray-500">Offline</p>
-    </div>
-    <div class="glass-card rounded-xl p-4 text-center">
-      <div class="w-3 h-3 bg-gray-400 rounded-full mx-auto mb-2"></div>
-      <p class="text-sm font-medium text-gray-700">Temp Sensor</p>
-      <p class="text-xs text-gray-500">Offline</p>
-    </div>
-  </div>
-
-  <!-- Footer -->
-  <footer class="mt-12 text-center text-white text-opacity-70">
-    <p class="text-sm">Last updated: <span id="lastUpdated">--:--:--</span></p>
   </footer>
 
   <script>
     // Update timestamp
     function updateTimestamp() {
       const now = new Date();
-      document.getElementById('lastUpdated').textContent = now.toLocaleTimeString();
+      document.getElementById('lastUpdated').textContent = now.toLocaleTimeString('en-GB', {
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
     }
     
     // Update every second
     setInterval(updateTimestamp, 1000);
     updateTimestamp();
 
-    // Add some animation on load
+    // Add animation on load
     window.addEventListener('load', () => {
       const cards = document.querySelectorAll('.parameter-card');
       cards.forEach((card, index) => {
         setTimeout(() => {
           card.style.opacity = '0';
-          card.style.transform = 'translateY(50px)';
-          card.style.transition = 'all 0.6s ease';
+          card.style.transform = 'scale(0.8)';
+          card.style.transition = 'all 0.4s ease';
           
           setTimeout(() => {
             card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
+            card.style.transform = 'scale(1)';
           }, 50);
-        }, index * 150);
+        }, index * 80);
       });
     });
   </script>

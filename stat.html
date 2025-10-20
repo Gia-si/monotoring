@@ -8,13 +8,21 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { font-family: 'Inter', sans-serif; }
-    .parameter-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
-    .parameter-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
-    .value { font-size: 1.75rem; font-weight: 700; color: #111827; }
-    .unit { font-size: 1rem; color: #4b5563; margin-left: 4px; }
-    .high { color: #16a34a; } /* xanh */
-    .low { color: #dc2626; }  /* đỏ */
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .parameter-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .parameter-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+    .value {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #111827;
+    }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen flex flex-col items-center justify-center p-6">
@@ -22,73 +30,53 @@
     <h1 class="text-3xl font-semibold text-gray-800">Environmental Condition - Điều Kiện Môi Trường</h1>
   </header>
 
+  <!-- Era Widget -->
   <script src="https://www.unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener('DOMContentLoaded', () => {
       const eraWidget = new EraWidget();
-
-      let configPh, configDo, configEc, configTO, configTds, configWL;
+      let configPh = null, configDo = null, configEc = null, configTO = null, configTds = null, configWL = null;
 
       eraWidget.init({
         needRealtimeConfigs: true,
         maxRealtimeConfigsCount: 6,
-
         onConfiguration: (configuration) => {
-          configuration.realtime_configs.forEach(cfg => {
-            switch (cfg.pin) {
-              case 1: configPh = cfg; break;
-              case 2: configDo = cfg; break;
-              case 3: configEc = cfg; break;
-              case 4: configTO = cfg; break;
-              case 5: configTds = cfg; break;
-              case 8: configWL = cfg; break; // ✅ đúng pin 8
-            }
-          });
+          // Gán cấu hình cho từng cảm biến theo thứ tự trong ERa
+          configPh  = configuration.realtime_configs[0]; // PIN 1
+          configDo  = configuration.realtime_configs[1]; // PIN 2
+          configEc  = configuration.realtime_configs[2]; // PIN 3
+          configTO  = configuration.realtime_configs[3]; // PIN 4
+          configTds = configuration.realtime_configs[4]; // PIN 5
+          configWL  = configuration.realtime_configs[5]; // PIN 8 (Water Level)
         },
-
         onValues: (values) => {
           const updateUI = (config, id, formatValue) => {
             if (config && values[config.id]) {
               const val = values[config.id].value;
               const el = document.getElementById(id);
-              if (el) el.innerText = formatValue ? formatValue(val) : Number(val).toFixed(2);
+              if (el) {
+                el.innerText = formatValue ? formatValue(val) : val.toFixed(2);
+              }
             }
           };
 
-          updateUI(configPh,  "phValue");
-          updateUI(configDo,  "doValue");
-          updateUI(configEc,  "ecValue");
-          updateUI(configTO,  "watertempValue");
-          updateUI(configTds, "tdsValue");
-
-          // ✅ Water Level: hiển thị HIGH / LOW
-          if (configWL && values[configWL.id]) {
-            const wlVal = parseInt(values[configWL.id].value);
-            const wlEl = document.getElementById("wlValue");
-            if (wlEl) {
-              if (wlVal === 1) {
-                wlEl.innerText = "HIGH";
-                wlEl.className = "value high";
-              } else if (wlVal === 0) {
-                wlEl.innerText = "LOW";
-                wlEl.className = "value low";
-              } else {
-                wlEl.innerText = "--";
-                wlEl.className = "value";
-              }
-            }
-          }
+          updateUI(configPh,  'phValue');
+          updateUI(configDo,  'doValue');
+          updateUI(configEc,  'ecValue');
+          updateUI(configTO,  'watertempValue');
+          updateUI(configTds, 'tdsValue');
+          updateUI(configWL, 'wlValue');
         },
       });
-
       eraWidget.ready();
     });
   </script>
 
+  <!-- Dashboard layout -->
   <main class="w-full max-w-6xl space-y-8">
 
-    <!-- Hàng 1 -->
+    <!-- Hàng 1: 3 card -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
         <i class="fas fa-tint text-blue-500 text-3xl"></i>
@@ -115,7 +103,7 @@
       </div>
     </div>
 
-    <!-- Hàng 2 -->
+    <!-- Hàng 2: 3 card -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
         <i class="fas fa-water text-teal-500 text-3xl"></i>
@@ -133,6 +121,7 @@
         </div>
       </div>
 
+      <!-- ✅ Water Level hiển thị 0 / 1 -->
       <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
         <i class="fas fa-water-rise text-indigo-500 text-3xl"></i>
         <div>

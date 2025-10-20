@@ -41,42 +41,68 @@
   <input type="checkbox" id="ecCheckbox" style="display:none;">
   <input type="checkbox" id="toCheckbox" style="display:none;">
   <input type="checkbox" id="tdsCheckbox" style="display:none;">
+  <input type="checkbox" id="wlCheckbox" style="display:none;">
 
   <!-- Era Widget -->
   <script src="https://www.unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
 
-  <!-- Script (giữ nguyên, chỉ chỉnh cách cập nhật nội dung) -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const eraWidget = new EraWidget();
-      let configPh = null, configDo = null, configEc = null, configTO = null, configTds = null;
+      let configPh = null, configDo = null, configEc = null, configTO = null, configTds = null, configWL = null;
 
       eraWidget.init({
         needRealtimeConfigs: true,
-        maxRealtimeConfigsCount: 5,
+        maxRealtimeConfigsCount: 6,
         onConfiguration: (configuration) => {
           configPh  = configuration.realtime_configs[0];  
           configDo  = configuration.realtime_configs[1];  
           configEc  = configuration.realtime_configs[2];  
           configTO  = configuration.realtime_configs[3];  
           configTds = configuration.realtime_configs[4];  
+          configWL  = configuration.realtime_configs[5];  // Water Level
         },
         onValues: (values) => {
-          const updateUI = (config, id, checkboxId) => {
+          const updateUI = (config, id, checkboxId, formatValue) => {
             if (config && values[config.id]) {
               const val = values[config.id].value;
               const el = document.getElementById(id);
-              if (el) el.innerText = val.toFixed(2); // chỉ cập nhật giá trị, không đụng đến đơn vị
-              document.getElementById(checkboxId).checked = val > 0;
+              if (!el) return;
+
+              // Xử lý riêng cho Water Level (giá trị uint8_t 0 hoặc 1)
+              if (id === 'wlValue') {
+                const wlVal = parseInt(val); // ép kiểu về số nguyên
+                if (wlVal === 1) {
+                  el.innerText = "High";
+                  el.style.color = "green";
+                } else if (wlVal === 0) {
+                  el.innerText = "Low";
+                  el.style.color = "red";
+                } else {
+                  el.innerText = "--";
+                  el.style.color = "#111827";
+                }
+              } else {
+                // Cập nhật giá trị các cảm biến khác
+                el.innerText = formatValue ? formatValue(val) : parseFloat(val).toFixed(2);
+              }
+
+              // Checkbox để kiểm tra thay đổi (nếu cần)
+              const checkbox = document.getElementById(checkboxId);
+              if (checkbox) checkbox.checked = parseFloat(val) > 0;
             }
           };
+
+          // Cập nhật từng cảm biến
           updateUI(configPh,  'phValue',        'phCheckbox');
           updateUI(configDo,  'doValue',        'doCheckbox');
           updateUI(configEc,  'ecValue',        'ecCheckbox');
           updateUI(configTO,  'watertempValue', 'toCheckbox');
           updateUI(configTds, 'tdsValue',       'tdsCheckbox');
+          updateUI(configWL,  'wlValue',        'wlCheckbox');
         },
       });
+
       eraWidget.ready();
     });
   </script>
@@ -84,7 +110,7 @@
   <!-- Dashboard layout -->
   <main class="w-full max-w-6xl space-y-8">
 
-    <!-- Hàng trên: 3 card -->
+    <!-- Hàng 1: 3 card -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
         <i class="fas fa-tint text-blue-500 text-3xl"></i>
@@ -111,9 +137,9 @@
       </div>
     </div>
 
-    <!-- Hàng dưới: 2 card, căn giữa -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 justify-items-center">
-      <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4 w-full sm:w-3/4 lg:w-2/3">
+    <!-- Hàng 2: 3 card -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
         <i class="fas fa-water text-teal-500 text-3xl"></i>
         <div>
           <h2 class="text-lg font-semibold text-gray-700">TDS</h2>
@@ -121,11 +147,19 @@
         </div>
       </div>
 
-      <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4 w-full sm:w-3/4 lg:w-2/3">
+      <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
         <i class="fas fa-thermometer-three-quarters text-cyan-500 text-3xl"></i>
         <div>
           <h2 class="text-lg font-semibold text-gray-700">Water Temperature</h2>
           <p class="value"><span id="watertempValue">--</span><span class="unit">°C</span></p>
+        </div>
+      </div>
+
+      <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
+        <i class="fas fa-water-rise text-indigo-500 text-3xl"></i>
+        <div>
+          <h2 class="text-lg font-semibold text-gray-700">Water Level</h2>
+          <p class="value"><span id="wlValue">--</span></p>
         </div>
       </div>
     </div>

@@ -36,15 +36,15 @@
   </header>
 
   <!-- Invisible checkboxes -->
-  <input type="checkbox" id="phCheckbox" style="display:none;">
-  <input type="checkbox" id="doCheckbox" style="display:none;">
-  <input type="checkbox" id="ecCheckbox" style="display:none;">
-  <input type="checkbox" id="toCheckbox" style="display:none;">
-  <input type="checkbox" id="tdsCheckbox" style="display:none;">
-  <input type="checkbox" id="wlCheckbox" style="display:none;">
+  <input type="checkbox" id="phCheckbox" hidden>
+  <input type="checkbox" id="doCheckbox" hidden>
+  <input type="checkbox" id="ecCheckbox" hidden>
+  <input type="checkbox" id="toCheckbox" hidden>
+  <input type="checkbox" id="tdsCheckbox" hidden>
+  <input type="checkbox" id="wlCheckbox" hidden>
 
   <!-- Era Widget -->
-  <script src="https://www.unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
+  <script src="https://www.unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js" defer></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -55,29 +55,69 @@
         needRealtimeConfigs: true,
         maxRealtimeConfigsCount: 6,
         onConfiguration: (configuration) => {
-          // Tìm cấu hình theo tên, không phụ thuộc thứ tự
-          const getConfig = (name) =>
-            configuration.realtime_configs.find(c => c.name.toLowerCase() === name.toLowerCase());
+          // Chuẩn hóa tên để so khớp linh hoạt bất kể dấu/khoảng trắng/chữ hoa
+          const normalize = (s) =>
+            (s || '')
+              .toString()
+              .normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '')
+              .replace(/[\s_\-]/g, '')
+              .toLowerCase();
 
-          configPh  = getConfig('PH');
-          configDo  = getConfig('DO');
-          configEc  = getConfig('EC');
-          configTO  = getConfig('TO');
-          configTds = getConfig('TDS');
-          configWL  = getConfig('WL');
+          const list = configuration.realtime_configs || [];
 
-          console.log("Cấu hình nhận được:", configuration.realtime_configs.map(c => c.name));
+          // Tìm theo tên hoặc alias
+          const getConfigByName = (name, alts = []) => {
+            const targets = [name, ...alts].map(normalize);
+            return list.find(c => targets.includes(normalize(c?.name))) || null;
+          };
+
+          // Map theo tên; nếu không thấy thì fallback theo PIN tương ứng
+          configPh  = getConfigByName('PH',  ['ph'])                                       || list.find(c => c.pin === 1) || null;
+          configDo  = getConfigByName('DO',  ['dissolvedoxygen','oxygen'])                 || list.find(c => c.pin === 2) || null;
+          configEc  = getConfigByName('EC',  ['conductivity'])                             || list.find(c => c.pin === 3) || null;
+          configTO  = getConfigByName('TO',  ['temp','watertemp','watertemperature','wt']) || list.find(c => c.pin === 4) || null;
+          configTds = getConfigByName('TDS', ['tds'])                                      || list.find(c => c.pin === 5) || null;
+          configWL  = getConfigByName('WL',  ['waterlevel','water level','mucnuoc','muc nuoc','wl']) || list.find(c => c.pin === 6 || null;
+
+          console.table(list.map(c => ({ name: c?.name, id: c?.id, pin: c?.pin })));
           console.log("Mapping:", { configPh, configDo, configEc, configTO, configTds, configWL });
         },
 
         onValues: (values) => {
-          const updateUI = (config, id, checkboxId, formatValue) => {
-            if (config && values[config.id]) {
-              const val = values[config.id].value;
-              const el = document.getElementById(id);
-              if (el) el.innerText = formatValue ? formatValue(val) : val.toFixed(2);
-              document.getElementById(checkboxId).checked = val > 0;
+          try {
+            console.log('Era values keys:', Array.isArray(values) ? values.map(v => v?.id ?? v?.pin ?? v?.name) : Object.keys(values || {}));
+          } catch (_) {}
+
+          const toNumber = (v) => {
+            const n = Number(v);
+            return Number.isFinite(n) ? n : null;
+          };
+
+          const getDatum = (config) => {
+            if (!config || !values) return null;
+            const byId   = config.id  != null ? (values[config.id]  ?? values[String(config.id)])   : null;
+            const byPin  = config.pin != null ? (values[config.pin] ?? values[String(config.pin)])  : null;
+            const byName = config.name ? (values[config.name] ?? values[(config.name||'').toLowerCase()]) : null;
+            let item = byId || byPin || byName || null;
+            if (!item && Array.isArray(values)) {
+              const lname = (config.name || '').toLowerCase();
+              item = values.find(v => v?.id === config.id || v?.pin === config.pin || (v?.name || '').toLowerCase() === lname) || null;
             }
+            return item;
+          };
+
+          const updateUI = (config, id, checkboxId, formatValue) => {
+            const datum = getDatum(config);
+            const raw = datum && typeof datum === 'object' && 'value' in datum ? datum.value : datum;
+            if (raw == null) return;
+
+            const num = toNumber(raw);
+            const el = document.getElementById(id);
+            if (el) el.innerText = formatValue ? formatValue(raw) : (num !== null ? num.toFixed(2) : String(raw));
+
+            const cb = document.getElementById(checkboxId);
+            if (cb) cb.checked = num !== null ? num > 0 : String(raw).length > 0;
           };
 
           updateUI(configPh,  'phValue',        'phCheckbox');

@@ -1,177 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Water Parameters Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trạng thái thiết bị</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Inter', sans-serif;
+      background: #f4f6f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
     }
-    .parameter-card {
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    .container {
+      background: #fff;
+      padding: 30px 40px;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-align: center;
     }
-    .parameter-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    h2 {
+      margin-bottom: 20px;
+      color: #222;
     }
-    .value {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: #111827;
+    .status {
+      font-size: 24px;
+      font-weight: 600;
+      padding: 10px 20px;
+      border-radius: 12px;
+      display: inline-block;
+      min-width: 100px;
     }
-    .unit {
-      font-size: 1rem;
-      color: #4b5563;
-      margin-left: 4px;
+    .high {
+      background-color: #28a745;
+      color: white;
+    }
+    .low {
+      background-color: #dc3545;
+      color: white;
     }
   </style>
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col items-center justify-center p-6">
-  <header class="mb-8 text-center">
-    <h1 class="text-3xl font-semibold text-gray-800">Environmental Condition - Điều Kiện Môi Trường</h1>
-  </header>
-
-  <!-- Invisible checkboxes -->
-  <input type="checkbox" id="phCheckbox" style="display:none;">
-  <input type="checkbox" id="doCheckbox" style="display:none;">
-  <input type="checkbox" id="ecCheckbox" style="display:none;">
-  <input type="checkbox" id="toCheckbox" style="display:none;">
-  <input type="checkbox" id="tdsCheckbox" style="display:none;">
-  <input type="checkbox" id="wlCheckbox" style="display:none;">
-
-  <!-- Era Widget -->
-  <script src="https://www.unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
+<body>
+  <div class="container">
+    <h2>Trạng thái đầu ra WL</h2>
+    <div id="wlStatus" class="status low">LOW</div>
+  </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const eraWidget = new EraWidget();
-      let configPh = null, configDo = null, configEc = null, configTO = null, configTds = null, configWL = null;
-
-      eraWidget.init({
-  needRealtimeConfigs: true,
-  maxRealtimeConfigsCount: 6,
-  onConfiguration: (configuration) => {
-    configuration.realtime_configs.forEach(cfg => {
-      switch (cfg.name.toUpperCase()) {
-        case "PH":  configPh = cfg; break;
-        case "DO":  configDo = cfg; break;
-        case "EC":  configEc = cfg; break;
-        case "TO":  configTO = cfg; break;
-        case "TDS": configTds = cfg; break;
-        case "WL":  configWL = cfg; break;
+    // Hàm cập nhật trạng thái
+    function updateStatus(value) {
+      const el = document.getElementById("wlStatus");
+      if (parseInt(value) === 1) {
+        el.textContent = "HIGH";
+        el.className = "status high";
+      } else {
+        el.textContent = "LOW";
+        el.className = "status low";
       }
-    });
-    console.log("✅ Config WL:", configWL);
-  },
-  onValues: (values) => {
-    const updateUI = (config, id, checkboxId, formatValue) => {
-      if (config && values[config.id]) {
-        const val = values[config.id].value;
-        const el = document.getElementById(id);
-        if (!el) return;
+    }
 
-        // Xử lý riêng Water Level
-        if (id === 'wlValue') {
-          const wlVal = parseInt(val.toString().trim());
-          console.log("📡 Water Level Value:", wlVal);
-
-          if (wlVal === 1) {
-            el.innerText = "High";
-            el.style.color = "green";
-          } else if (wlVal === 0) {
-            el.innerText = "Low";
-            el.style.color = "red";
-          } else {
-            el.innerText = "--";
-            el.style.color = "#111827";
-          }
-        } else {
-          // Các cảm biến khác
-          el.innerText = formatValue ? formatValue(val) : parseFloat(val).toFixed(2);
-        }
-
-        // Checkbox (tùy chọn)
-        const checkbox = document.getElementById(checkboxId);
-        if (checkbox) checkbox.checked = parseFloat(val) > 0;
+    // Hàm nhận dữ liệu từ ERa Cloud
+    window.addEventListener("message", (event) => {
+      if (!event.data || !event.data.variables) return;
+      const wlValue = event.data.variables["WL"];  // ← đặt đúng tên biến trong ERa Dashboard
+      if (wlValue !== undefined) {
+        updateStatus(wlValue);
       }
-    };
-
-    // Cập nhật từng cảm biến
-    updateUI(configPh,  'phValue',        'phCheckbox');
-    updateUI(configDo,  'doValue',        'doCheckbox');
-    updateUI(configEc,  'ecValue',        'ecCheckbox');
-    updateUI(configTO,  'watertempValue', 'toCheckbox');
-    updateUI(configTds, 'tdsValue',       'tdsCheckbox');
-    updateUI(configWL,  'wlValue',        'wlCheckbox');
-  },
-});
-      eraWidget.ready();
     });
   </script>
-
-  <!-- Dashboard layout -->
-  <main class="w-full max-w-6xl space-y-8">
-
-    <!-- Hàng 1: 3 card -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-        <i class="fas fa-tint text-blue-500 text-3xl"></i>
-        <div>
-          <h2 class="text-lg font-semibold text-gray-700">pH</h2>
-          <p class="value"><span id="phValue">--</span></p>
-        </div>
-      </div>
-
-      <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-        <i class="fas fa-wind text-green-500 text-3xl"></i>
-        <div>
-          <h2 class="text-lg font-semibold text-gray-700">DO (Dissolved Oxygen)</h2>
-          <p class="value"><span id="doValue">--</span><span class="unit">mg/L</span></p>
-        </div>
-      </div>
-
-      <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-        <i class="fas fa-flask text-purple-500 text-3xl"></i>
-        <div>
-          <h2 class="text-lg font-semibold text-gray-700">EC</h2>
-          <p class="value"><span id="ecValue">--</span><span class="unit">µS/cm</span></p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Hàng 2: 3 card -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-        <i class="fas fa-water text-teal-500 text-3xl"></i>
-        <div>
-          <h2 class="text-lg font-semibold text-gray-700">TDS</h2>
-          <p class="value"><span id="tdsValue">--</span><span class="unit">ppm</span></p>
-        </div>
-      </div>
-
-      <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-        <i class="fas fa-thermometer-three-quarters text-cyan-500 text-3xl"></i>
-        <div>
-          <h2 class="text-lg font-semibold text-gray-700">Water Temperature</h2>
-          <p class="value"><span id="watertempValue">--</span><span class="unit">°C</span></p>
-        </div>
-      </div>
-
-      <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-        <i class="fas fa-water-rise text-indigo-500 text-3xl"></i>
-        <div>
-          <h2 class="text-lg font-semibold text-gray-700">Water Level</h2>
-          <p class="value"><span id="wlValue">--</span></p>
-        </div>
-      </div>
-    </div>
-
-  </main>
 </body>
 </html>
-
-

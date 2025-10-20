@@ -34,44 +34,45 @@
 
 
 <script src="https://www.unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
+<!-- Script chính -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const eraWidget = new EraWidget();
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const eraWidget = new EraWidget();
+    let configPh = null, configDo = null, configEc = null, 
+        configTO = null, configTds = null;
 
-      let configPh = null, configDo = null, configEc = null, 
-          configTO = null, configTds = null,
+    eraWidget.init({
+      needRealtimeConfigs: true,
+      maxRealtimeConfigsCount: 5,
+      onConfiguration: (configuration) => {
+        configPh  = configuration.realtime_configs[0];  
+        configDo  = configuration.realtime_configs[1];  
+        configEc  = configuration.realtime_configs[2];  
+        configTO  = configuration.realtime_configs[3];  
+        configTds = configuration.realtime_configs[4];  
+      },
 
-      eraWidget.init({
-        onConfiguration: (configuration) => {
-          configPh  =  configuration.realtime_configs[0];  
-          configDo  =  configuration.realtime_configs[1];  
-          configEc  =  configuration.realtime_configs[2];  
-          configTo  =  configuration.realtime_configs[3];  
-          configTds =  configuration.realtime_configs[4];  
-        },
+      onValues: (values) => {
+        const updateUI = (config, id, checkboxId) => {
+          if (config && values[config.id]) {
+            const val = values[config.id].value;
+            document.getElementById(id).innerText = val.toFixed(2);
+            document.getElementById(checkboxId).checked = val > 0;
+          }
+        };
 
-        onValues: (values) => {
-          const updateUI = (config, id, checkboxId) => {
-            if (config && values[config.id]) {
-              const val = values[config.id].value;
-              document.getElementById(id).innerText = val.toFixed(2);
-              document.getElementById(checkboxId).checked = val > 0;
-            }
-          };
-
-          updateUI(configPh,  'ph',        'phCheckbox');
-          updateUI(configDo,  'do',        'doCheckbox');
-          updateUI(configEc,  'ec',        'ecCheckbox');
-          updateUI(configWt,  'watertemp', 'toCheckbox');
-          updateUI(configTds, 'tds',       'tdsCheckbox');
-        },
-      });
-
-      // Đảm bảo gọi sau khi DOM và widget sẵn sàng
-      eraWidget.ready();
+        updateUI(configPh,  'ph',        'phCheckbox');
+        updateUI(configDo,  'do',        'doCheckbox');
+        updateUI(configEc,  'ec',        'ecCheckbox');
+        updateUI(configTO,  'watertemp', 'toCheckbox');
+        updateUI(configTds, 'tds',       'tdsCheckbox');
+      },
     });
-  </script>
+
+    eraWidget.ready();
+  });
+</script>
 
   <!-- Dashboard layout -->
   <main class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full max-w-6xl">
@@ -119,6 +120,7 @@
   </main>
 </body>
 </html>
+
 
 
 

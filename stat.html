@@ -52,53 +52,63 @@
       let configPh = null, configDo = null, configEc = null, configTO = null, configTds = null, configWL = null;
 
       eraWidget.init({
-        needRealtimeConfigs: true,
-        maxRealtimeConfigsCount: 6,
-        onConfiguration: (configuration) => {
-          configPh  = configuration.realtime_configs[0];  
-          configDo  = configuration.realtime_configs[1];  
-          configEc  = configuration.realtime_configs[2];  
-          configTO  = configuration.realtime_configs[3];  
-          configTds = configuration.realtime_configs[4];  
-          configWL  = configuration.realtime_configs[5];  // Water Level
-        },
-        onValues: (values) => {
-          const updateUI = (config, id, checkboxId, formatValue) => {
-            if (config && values[config.id]) {
-              const val = values[config.id].value;
-              const el = document.getElementById(id);
-              if (!el) return;
-            // Xử lý riêng cho Water Level (giá trị uint8_t 0 hoặc 1)
-            if (id === 'wlValue') {
-              const wlVal = parseInt(val.toString().trim()); // loại bỏ khoảng trắng hoặc ký tự xuống dòng
-              if (wlVal === 1) {
-                el.innerText = "High";
-                el.style.color = "green";
-              } else if (wlVal === 0) {
-                el.innerText = "Low";
-                el.style.color = "red";
-              } else {
-                el.innerText = "--";
-                el.style.color = "#111827";
-              }
-            }
+  needRealtimeConfigs: true,
+  maxRealtimeConfigsCount: 6,
+  onConfiguration: (configuration) => {
+    configuration.realtime_configs.forEach(cfg => {
+      switch (cfg.name.toUpperCase()) {
+        case "PH":  configPh = cfg; break;
+        case "DO":  configDo = cfg; break;
+        case "EC":  configEc = cfg; break;
+        case "TO":  configTO = cfg; break;
+        case "TDS": configTds = cfg; break;
+        case "WL":  configWL = cfg; break;
+      }
+    });
+    console.log("✅ Config WL:", configWL);
+  },
+  onValues: (values) => {
+    const updateUI = (config, id, checkboxId, formatValue) => {
+      if (config && values[config.id]) {
+        const val = values[config.id].value;
+        const el = document.getElementById(id);
+        if (!el) return;
 
-              // Checkbox để kiểm tra thay đổi (nếu cần)
-              const checkbox = document.getElementById(checkboxId);
-              if (checkbox) checkbox.checked = parseFloat(val) > 0;
-            }
-          };
+        // Xử lý riêng Water Level
+        if (id === 'wlValue') {
+          const wlVal = parseInt(val.toString().trim());
+          console.log("📡 Water Level Value:", wlVal);
 
-          // Cập nhật từng cảm biến
-          updateUI(configPh,  'phValue',        'phCheckbox');
-          updateUI(configDo,  'doValue',        'doCheckbox');
-          updateUI(configEc,  'ecValue',        'ecCheckbox');
-          updateUI(configTO,  'watertempValue', 'toCheckbox');
-          updateUI(configTds, 'tdsValue',       'tdsCheckbox');
-          updateUI(configWL,  'wlValue',        'wlCheckbox');
-        },
-      });
+          if (wlVal === 1) {
+            el.innerText = "High";
+            el.style.color = "green";
+          } else if (wlVal === 0) {
+            el.innerText = "Low";
+            el.style.color = "red";
+          } else {
+            el.innerText = "--";
+            el.style.color = "#111827";
+          }
+        } else {
+          // Các cảm biến khác
+          el.innerText = formatValue ? formatValue(val) : parseFloat(val).toFixed(2);
+        }
 
+        // Checkbox (tùy chọn)
+        const checkbox = document.getElementById(checkboxId);
+        if (checkbox) checkbox.checked = parseFloat(val) > 0;
+      }
+    };
+
+    // Cập nhật từng cảm biến
+    updateUI(configPh,  'phValue',        'phCheckbox');
+    updateUI(configDo,  'doValue',        'doCheckbox');
+    updateUI(configEc,  'ecValue',        'ecCheckbox');
+    updateUI(configTO,  'watertempValue', 'toCheckbox');
+    updateUI(configTds, 'tdsValue',       'tdsCheckbox');
+    updateUI(configWL,  'wlValue',        'wlCheckbox');
+  },
+});
       eraWidget.ready();
     });
   </script>
@@ -163,4 +173,5 @@
   </main>
 </body>
 </html>
+
 

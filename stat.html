@@ -68,24 +68,20 @@
               const val = values[config.id].value;
               const el = document.getElementById(id);
               if (!el) return;
-
-              // Xử lý riêng cho Water Level (giá trị uint8_t 0 hoặc 1)
-              if (id === 'wlValue') {
-                const wlVal = parseInt(val); // ép kiểu về số nguyên
-                if (wlVal === 1) {
-                  el.innerText = "High";
-                  el.style.color = "green";
-                } else if (wlVal === 0) {
-                  el.innerText = "Low";
-                  el.style.color = "red";
-                } else {
-                  el.innerText = "--";
-                  el.style.color = "#111827";
-                }
+            // Xử lý riêng cho Water Level (giá trị uint8_t 0 hoặc 1)
+            if (id === 'wlValue') {
+              const wlVal = parseInt(val.toString().trim()); // loại bỏ khoảng trắng hoặc ký tự xuống dòng
+              if (wlVal === 1) {
+                el.innerText = "High";
+                el.style.color = "green";
+              } else if (wlVal === 0) {
+                el.innerText = "Low";
+                el.style.color = "red";
               } else {
-                // Cập nhật giá trị các cảm biến khác
-                el.innerText = formatValue ? formatValue(val) : parseFloat(val).toFixed(2);
+                el.innerText = "--";
+                el.style.color = "#111827";
               }
+            }
 
               // Checkbox để kiểm tra thay đổi (nếu cần)
               const checkbox = document.getElementById(checkboxId);
@@ -167,3 +163,4 @@
   </main>
 </body>
 </html>
+

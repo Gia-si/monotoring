@@ -44,11 +44,11 @@
 
       eraWidget.init({
         onConfiguration: (configuration) => {
-          configPh  = configuration.realtime_configs.find(cfg => cfg.name === 'PH');
-          configDo  = configuration.realtime_configs.find(cfg => cfg.name === 'DO');
-          configEc  = configuration.realtime_configs.find(cfg => cfg.name === 'EC');
-          configTo  = configuration.realtime_configs.find(cfg => cfg.name === 'TO');
-          configTds = configuration.realtime_configs.find(cfg => cfg.name === 'TDS');
+          configPh  =  configuration.realtime_configs[0];  
+          configDo  =  configuration.realtime_configs[1];  
+          configEc  =  configuration.realtime_configs[2];  
+          configTo  =  configuration.realtime_configs[3];  
+          configTds =  configuration.realtime_configs[4];  
         },
 
         onValues: (values) => {
@@ -119,5 +119,6 @@
   </main>
 </body>
 </html>
+
 
 

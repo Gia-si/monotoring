@@ -49,19 +49,27 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const eraWidget = new EraWidget();
-      let configPh = null, configDo = null, configEc = null, configTO = null, configTds = null, configWL = null;
+      let configPh, configDo, configEc, configTO, configTds, configWL;
 
       eraWidget.init({
         needRealtimeConfigs: true,
         maxRealtimeConfigsCount: 6,
         onConfiguration: (configuration) => {
-          configPh  = configuration.realtime_configs[0];  
-          configDo  = configuration.realtime_configs[1];  
-          configEc  = configuration.realtime_configs[2];  
-          configTO  = configuration.realtime_configs[3];  
-          configTds = configuration.realtime_configs[4];  
-          configWL  = configuration.realtime_configs[5];  // Water Level
+          // Tìm cấu hình theo tên, không phụ thuộc thứ tự
+          const getConfig = (name) =>
+            configuration.realtime_configs.find(c => c.name.toLowerCase() === name.toLowerCase());
+
+          configPh  = getConfig('PH');
+          configDo  = getConfig('DO');
+          configEc  = getConfig('EC');
+          configTO  = getConfig('TO');
+          configTds = getConfig('TDS');
+          configWL  = getConfig('WL');
+
+          console.log("Cấu hình nhận được:", configuration.realtime_configs.map(c => c.name));
+          console.log("Mapping:", { configPh, configDo, configEc, configTO, configTds, configWL });
         },
+
         onValues: (values) => {
           const updateUI = (config, id, checkboxId, formatValue) => {
             if (config && values[config.id]) {
@@ -80,6 +88,7 @@
           updateUI(configWL,  'wlValue',        'wlCheckbox');
         },
       });
+
       eraWidget.ready();
     });
   </script>
@@ -133,7 +142,7 @@
       </div>
 
       <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-        <i class="fas fa-water-rise text-indigo-500 text-3xl"></i>
+        <i class="fas fa-water text-indigo-500 text-3xl"></i>
         <div>
           <h2 class="text-lg font-semibold text-gray-700">Water Level</h2>
           <p class="value"><span id="wlValue">--</span></p>
@@ -144,4 +153,3 @@
   </main>
 </body>
 </html>
-

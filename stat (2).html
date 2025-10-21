@@ -49,26 +49,61 @@
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const eraWidget = new EraWidget();
-      let configPh = null, configDo = null, configEc = null, configTO = null, configTds = null, configWL = null;
+      let configPh, configDo, configEc, configTO, configTds, configWL;
 
       eraWidget.init({
         needRealtimeConfigs: true,
-        maxRealtimeConfigsCount: 6,
+        maxRealtimeConfigsCount: 10,
         onConfiguration: (configuration) => {
-          configPh  = configuration.realtime_configs[0];  
-          configDo  = configuration.realtime_configs[1];  
-          configEc  = configuration.realtime_configs[2];  
-          configTO  = configuration.realtime_configs[3];  
-          configTds = configuration.realtime_configs[4];  
-          configWL  = configuration.realtime_configs[5];  // Water Level
+          // Tìm cấu hình theo tên với chuẩn hoá và alias để tránh sai khác đặt tên
+          const normalize = (s) => (s || "")
+            .toString()
+            .toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '') // bỏ dấu tiếng Việt
+            .replace(/[^a-z0-9]+/g, '');
+
+          const findByAliases = (aliases) => {
+            const normAliases = aliases.map(a => normalize(a));
+            return (configuration?.realtime_configs || []).find(c => {
+              const n = normalize(c?.name);
+              return n && normAliases.some(a => n === a || n.includes(a));
+            });
+          };
+
+          // Các alias thường gặp cho từng chỉ số
+          configPh  = findByAliases(['PH']);
+          configDo  = findByAliases(['DO','dissolved oxygen']);
+          configEc  = findByAliases(['EC','electrical conductivity']);
+          configTO  = findByAliases(['TO','WT','water temperature','temp']);
+          configTds = findByAliases(['TDS']);
+          configWL  = findByAliases(['WL','water level','muc nuoc','muc nuoc','mucnuoc','level','waterlevel']);
+
+          const names = (configuration?.realtime_configs || []).map(c => ({ id: c.id, name: c.name }));
+          console.log("Cấu hình nhận được (id:name):", names);
+          console.log("Mapping:", { configPh, configDo, configEc, configTO, configTds, configWL });
+          if (!configWL) {
+            console.warn('Không tìm thấy cấu hình Water Level (WL). Vui lòng kiểm tra tên cấu hình trong ERA.');
+          }
+          console.log("Danh sách cấu hình nhận từ ERA:", configuration.realtime_configs);
+
         },
+
         onValues: (values) => {
+          // Debug: tổng quan giá trị nhận được
+          try {
+            const valueIds = Object.keys(values || {});
+            console.log('onValues received ids:', valueIds);
+          } catch (e) {
+            console.log('onValues (cannot enumerate values):', values);
+          }
+
           const updateUI = (config, id, checkboxId, formatValue) => {
             if (config && values[config.id]) {
               const val = values[config.id].value;
               const el = document.getElementById(id);
-              if (el) el.innerText = formatValue ? formatValue(val) : val.toFixed(2);
-              document.getElementById(checkboxId).checked = val > 0;
+              if (el) el.innerText = formatValue ? formatValue(val) : Number(val).toFixed(2);
+              document.getElementById(checkboxId).checked = Number(val) > 0;
             }
           };
 
@@ -78,8 +113,33 @@
           updateUI(configTO,  'watertempValue', 'toCheckbox');
           updateUI(configTds, 'tdsValue',       'tdsCheckbox');
           updateUI(configWL,  'wlValue',        'wlCheckbox');
+
+          // Log trực tiếp giá trị WL nếu có, để dễ debug
+          if (configWL && values[configWL.id]) {
+            console.log('WL value:', values[configWL.id]);
+          } else {
+            console.log('WL missing in either config or values', {
+              hasConfigWL: !!configWL,
+              configWLId: configWL?.id,
+              hasWLValue: configWL ? !!values?.[configWL.id] : false
+            });
+          }
+
+          // Log các giá trị chưa map vào chỉ số nào để kiểm tra WL có được gửi hay không
+          const mappedIds = [configPh, configDo, configEc, configTO, configTds, configWL]
+            .filter(Boolean)
+            .map(c => String(c.id));
+          const allIds = Object.keys(values || {});
+          const unmatched = allIds.filter(id => !mappedIds.includes(id));
+          if (unmatched.length) {
+            console.log('Unmatched value ids (chưa map):', unmatched.reduce((acc, id) => {
+              acc[id] = values[id];
+              return acc;
+            }, {}));
+          }
         },
       });
+
       eraWidget.ready();
     });
   </script>
@@ -133,7 +193,7 @@
       </div>
 
       <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-        <i class="fas fa-water-rise text-indigo-500 text-3xl"></i>
+        <i class="fas fa-water text-indigo-500 text-3xl"></i>
         <div>
           <h2 class="text-lg font-semibold text-gray-700">Water Level</h2>
           <p class="value"><span id="wlValue">--</span></p>
@@ -144,5 +204,3 @@
   </main>
 </body>
 </html>
-
-

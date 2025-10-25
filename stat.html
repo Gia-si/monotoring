@@ -1,159 +1,898 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Water Parameters Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-    }
-    .parameter-card {
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .parameter-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-    }
-    .value {
-      font-size: 1.75rem;
-      font-weight: 700;
-      color: #111827;
-    }
-    .unit {
-      font-size: 1rem;
-      color: #4b5563;
-      margin-left: 4px;
-    }
-  </style>
-</head>
-<body class="bg-gray-50 min-h-screen flex flex-col items-center justify-center p-6">
-  <header class="mb-8 text-center">
-    <h1 class="text-3xl font-semibold text-gray-800">Environmental Condition - Điều Kiện Môi Trường</h1>
-  </header>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOSI - Aquaponics Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  <!-- Invisible checkboxes -->
-  <input type="checkbox" id="phCheckbox" style="display:none;">
-  <input type="checkbox" id="doCheckbox" style="display:none;">
-  <input type="checkbox" id="ecCheckbox" style="display:none;">
-  <input type="checkbox" id="toCheckbox" style="display:none;">
-  <input type="checkbox" id="tdsCheckbox" style="display:none;">
-  <input type="checkbox" id="wlCheckbox" style="display:none;">
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-  <!-- Era Widget -->
-  <script src="https://www.unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const eraWidget = new EraWidget();
-      let configPh, configDo, configEc, configTO, configTds, configWL;
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
 
-      eraWidget.init({
-        needRealtimeConfigs: true,
-        maxRealtimeConfigsCount: 10,
-        onConfiguration: (configuration) => {
-          // Tìm cấu hình theo tên, không phụ thuộc thứ tự
-          const getConfig = (name) =>
-            configuration.realtime_configs.find(c => c.name.toLowerCase() === name.toLowerCase());
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
 
-          configPh  = getConfig('PH');
-          configDo  = getConfig('DO');
-          configEc  = getConfig('EC');
-          configTO  = getConfig('TO');
-          configTds = getConfig('TDS');
-          configWL  = getConfig('WL');
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
 
-          console.log("Cấu hình nhận được:", configuration.realtime_configs.map(c => c.name));
-          console.log("Mapping:", { configPh, configDo, configEc, configTO, configTds, configWL });
-          console.log("Danh sách cấu hình nhận từ ERA:", configuration.realtime_configs);
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
 
-        },
+        .sensor-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 5px solid #667eea;
+        }
 
-        onValues: (values) => {
-          const updateUI = (config, id, checkboxId, formatValue) => {
-            if (config && values[config.id]) {
-              const val = values[config.id].value;
-              const el = document.getElementById(id);
-              if (el) el.innerText = formatValue ? formatValue(val) : Number(val).toFixed(2);
-              document.getElementById(checkboxId).checked = Number(val) > 0;
+        .sensor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .sensor-card.ph { border-left-color: #FF6B6B; }
+        .sensor-card.do { border-left-color: #4ECDC4; }
+        .sensor-card.ec { border-left-color: #45B7D1; }
+        .sensor-card.tds { border-left-color: #FFA07A; }
+        .sensor-card.temp { border-left-color: #FFD93D; }
+
+        .sensor-name {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sensor-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .sensor-unit {
+            font-size: 0.9em;
+            color: #999;
+        }
+
+        .sensor-status {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-good { color: #27AE60; }
+        .status-warning { color: #F39C12; }
+        .status-danger { color: #E74C3C; }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-analyze {
+            background: white;
+            color: #667eea;
+            flex: 1;
+            min-width: 200px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            border: 3px solid #764ba2;
+        }
+
+        .btn-analyze:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            background: #f0f4ff;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
             }
-          };
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
 
-          updateUI(configPh,  'phValue',        'phCheckbox');
-          updateUI(configDo,  'doValue',        'doCheckbox');
-          updateUI(configEc,  'ecValue',        'ecCheckbox');
-          updateUI(configTO,  'watertempValue', 'toCheckbox');
-          updateUI(configTds, 'tdsValue',       'tdsCheckbox');
-          updateUI(configWL,  'wlValue',        'wlCheckbox');
-        },
-      });
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
 
-      eraWidget.ready();
-    });
-  </script>
+        .close:hover {
+            color: #000;
+        }
 
-  <!-- Dashboard layout -->
-  <main class="w-full max-w-6xl space-y-8">
+        .modal-header {
+            margin-bottom: 25px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 15px;
+        }
 
-    <!-- Hàng 1: 3 card -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-        <i class="fas fa-tint text-blue-500 text-3xl"></i>
-        <div>
-          <h2 class="text-lg font-semibold text-gray-700">pH</h2>
-          <p class="value"><span id="phValue">--</span></p>
+        .modal-header h2 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .modal-header p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .concept {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 4px solid #667eea;
+        }
+
+        .concept h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .concept p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 25px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .data-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Analysis Modal */
+        .analysis-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .analysis-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .analysis-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .analysis-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-good {
+            background: #D4EDDA;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #FFF3CD;
+            color: #856404;
+        }
+
+        .badge-danger {
+            background: #F8D7DA;
+            color: #721C24;
+        }
+
+        .recommendation {
+            background: #E7F3FF;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border-left: 4px solid #45B7D1;
+            color: #0C5460;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 20% auto;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .btn-analyze {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🐟 TOSI Aquaponics - Cá Chép</h1>
+            <p>Hệ thống giám sát cảm biến thời gian thực cho nuôi Cá Chép</p>
         </div>
-      </div>
 
-      <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-        <i class="fas fa-wind text-green-500 text-3xl"></i>
-        <div>
-          <h2 class="text-lg font-semibold text-gray-700">DO (Dissolved Oxygen)</h2>
-          <p class="value"><span id="doValue">--</span><span class="unit">mg/L</span></p>
+        <div class="controls">
+            <button class="btn btn-analyze" onclick="showAnalysis()">📊 Phân Tích Hệ Thống</button>
         </div>
-      </div>
 
-      <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-        <i class="fas fa-flask text-purple-500 text-3xl"></i>
-        <div>
-          <h2 class="text-lg font-semibold text-gray-700">EC</h2>
-          <p class="value"><span id="ecValue">--</span><span class="unit">µS/cm</span></p>
+        <div class="dashboard">
+            <div class="sensor-card ph" onclick="showSensorDetail('ph')">
+                <div class="sensor-name">pH</div>
+                <div class="sensor-value" id="phValue">--</div>
+                <div class="sensor-unit">Độ axit/kiềm</div>
+                <div class="sensor-status" id="phStatus">--</div>
+            </div>
+
+            <div class="sensor-card do" onclick="showSensorDetail('do')">
+                <div class="sensor-name">DO</div>
+                <div class="sensor-value" id="doValue">--</div>
+                <div class="sensor-unit">mg/L</div>
+                <div class="sensor-status" id="doStatus">--</div>
+            </div>
+
+            <div class="sensor-card ec" onclick="showSensorDetail('ec')">
+                <div class="sensor-name">EC</div>
+                <div class="sensor-value" id="ecValue">--</div>
+                <div class="sensor-unit">mS/cm</div>
+                <div class="sensor-status" id="ecStatus">--</div>
+            </div>
+
+            <div class="sensor-card temp" onclick="showSensorDetail('temp')">
+                <div class="sensor-name">TO</div>
+                <div class="sensor-value" id="tempValue">--</div>
+                <div class="sensor-unit">°C</div>
+                <div class="sensor-status" id="tempStatus">--</div>
+            </div>
+
+            <div class="sensor-card tds" onclick="showSensorDetail('tds')">
+                <div class="sensor-name">TDS</div>
+                <div class="sensor-value" id="tdsValue">--</div>
+                <div class="sensor-unit">ppm</div>
+                <div class="sensor-status" id="tdsStatus">--</div>
+            </div>
         </div>
-      </div>
     </div>
 
-    <!-- Hàng 2: 3 card -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-        <i class="fas fa-water text-teal-500 text-3xl"></i>
-        <div>
-          <h2 class="text-lg font-semibold text-gray-700">TDS</h2>
-          <p class="value"><span id="tdsValue">--</span><span class="unit">ppm</span></p>
-        </div>
-      </div>
+    <!-- Modal Chi Tiết Cảm Biến -->
+    <div id="sensorModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSensorModal()">&times;</span>
+            <div class="modal-header">
+                <h2 id="modalTitle">Chi Tiết Cảm Biến</h2>
+                <p id="modalSubtitle">Thông tin chi tiết và lịch sử</p>
+            </div>
 
-      <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-        <i class="fas fa-thermometer-three-quarters text-cyan-500 text-3xl"></i>
-        <div>
-          <h2 class="text-lg font-semibold text-gray-700">Water Temperature</h2>
-          <p class="value"><span id="watertempValue">--</span><span class="unit">°C</span></p>
-        </div>
-      </div>
+            <div class="concept" id="conceptBox"></div>
 
-      <div class="parameter-card bg-white rounded-lg p-6 shadow-md flex items-center space-x-4">
-        <i class="fas fa-water text-indigo-500 text-3xl"></i>
-        <div>
-          <h2 class="text-lg font-semibold text-gray-700">Water Level</h2>
-          <p class="value"><span id="wlValue">--</span></p>
+            <div class="chart-container">
+                <canvas id="sensorChart"></canvas>
+            </div>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Thời gian</th>
+                        <th>Giá trị</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody id="dataTableBody">
+                </tbody>
+            </table>
         </div>
-      </div>
     </div>
 
-  </main>
+    <!-- Modal Phân Tích -->
+    <div id="analysisModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAnalysisModal()">&times;</span>
+            <div class="modal-header">
+                <h2>📊 Phân Tích Hệ Thống</h2>
+                <p>Tổng quan trạng thái tất cả cảm biến</p>
+            </div>
+
+            <table class="analysis-table">
+                <thead>
+                    <tr>
+                        <th>Cảm Biến</th>
+                        <th>Giá Trị Hiện Tại</th>
+                        <th>Trạng Thái</th>
+                        <th>Lời Khuyên</th>
+                    </tr>
+                </thead>
+                <tbody id="analysisTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ERA Widget Script -->
+    <script src="https://www.unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
+    <script>
+        // Liên kết phần tử HTML hiển thị dữ liệu cảm biến
+        const phValue = document.getElementById('phValue');
+        const doValue = document.getElementById('doValue');
+        const ecValue = document.getElementById('ecValue');
+        const tdsValue = document.getElementById('tdsValue');
+        const tempValue = document.getElementById('tempValue');
+
+        // Biến lưu cấu hình từng cảm biến
+        let configPh = null,
+            configDo = null,
+            configEc = null,
+            configTds = null,
+            configTemp = null;
+
+        // Biến lưu giá trị hiện tại
+        let currentValues = {
+            ph: null,
+            do: null,
+            ec: null,
+            tds: null,
+            temp: null
+        };
+
+        // Biến lưu lịch sử dữ liệu (24 giá trị gần nhất)
+        let dataHistory = {
+            ph: [],
+            do: [],
+            ec: [],
+            tds: [],
+            temp: []
+        };
+
+        // Khởi tạo ERA Widget
+        const eraWidget = new EraWidget();
+        eraWidget.init({
+            needRealtimeConfigs: true,
+            needHistoryConfigs: false,
+            needActions: false,
+            maxRealtimeConfigsCount: 10,
+            minRealtimeConfigsCount: 0,
+
+            onConfiguration: (configuration) => {
+                // Giả định thứ tự cấu hình trong ERA: 0: pH, 1: DO, 2: EC, 3: TDS, 4: Water Temp
+                configPh   = configuration.realtime_configs[0];
+                configDo   = configuration.realtime_configs[1];
+                configEc   = configuration.realtime_configs[2];
+                configTds  = configuration.realtime_configs[3];
+                configTemp = configuration.realtime_configs[4];
+
+                console.log('Cấu hình cảm biến nhận được:', configuration.realtime_configs);
+            },
+
+            onValues: (values) => {
+                // Cập nhật giá trị hiện tại
+                if (configPh && values[configPh.id]) {
+                    const phVal = values[configPh.id].value.toFixed(2);
+                    phValue.innerHTML = phVal;
+                    currentValues.ph = parseFloat(phVal);
+                    updateStatus('ph', phVal);
+                    addToHistory('ph', phVal);
+                }
+                if (configDo && values[configDo.id]) {
+                    const doVal = values[configDo.id].value.toFixed(2);
+                    doValue.innerHTML = doVal;
+                    currentValues.do = parseFloat(doVal);
+                    updateStatus('do', doVal);
+                    addToHistory('do', doVal);
+                }
+                if (configEc && values[configEc.id]) {
+                    const ecVal = values[configEc.id].value.toFixed(2);
+                    ecValue.innerHTML = ecVal;
+                    currentValues.ec = parseFloat(ecVal);
+                    updateStatus('ec', ecVal);
+                    addToHistory('ec', ecVal);
+                }
+                if (configTds && values[configTds.id]) {
+                    const tdsVal = values[configTds.id].value.toFixed(2);
+                    tdsValue.innerHTML = tdsVal;
+                    currentValues.tds = parseFloat(tdsVal);
+                    updateStatus('tds', tdsVal);
+                    addToHistory('tds', tdsVal);
+                }
+                if (configTemp && values[configTemp.id]) {
+                    const tempVal = values[configTemp.id].value.toFixed(2);
+                    tempValue.innerHTML = tempVal;
+                    currentValues.temp = parseFloat(tempVal);
+                    updateStatus('temp', tempVal);
+                    addToHistory('temp', tempVal);
+                }
+
+                console.log('Giá trị cập nhật từ ERA:', values);
+            },
+        });
+
+        // Hàm cập nhật trạng thái (Điều kiện cho Cá Chép)
+        function updateStatus(sensor, value) {
+            const val = parseFloat(value);
+            let status = '';
+            let statusClass = '';
+
+            switch(sensor) {
+                case 'ph':
+                    if (val >= 7.0 && val <= 8.5) {
+                        status = '✓ Tốt';
+                        statusClass = 'status-good';
+                    } else if (val >= 6.5 && val <= 9.0) {
+                        status = '⚠ Cảnh báo';
+                        statusClass = 'status-warning';
+                    } else {
+                        status = '✗ Nguy hiểm';
+                        statusClass = 'status-danger';
+                    }
+                    break;
+                case 'do':
+                    if (val >= 5.0 && val <= 8.0) {
+                        status = '✓ Tốt';
+                        statusClass = 'status-good';
+                    } else if (val >= 4.0) {
+                        status = '⚠ Cảnh báo';
+                        statusClass = 'status-warning';
+                    } else {
+                        status = '✗ Nguy hiểm';
+                        statusClass = 'status-danger';
+                    }
+                    break;
+                case 'ec':
+                    if (val >= 0.5 && val <= 1.5) {
+                        status = '✓ Tốt';
+                        statusClass = 'status-good';
+                    } else if (val >= 0.3 && val <= 2.0) {
+                        status = '⚠ Cảnh báo';
+                        statusClass = 'status-warning';
+                    } else {
+                        status = '✗ Nguy hiểm';
+                        statusClass = 'status-danger';
+                    }
+                    break;
+                case 'tds':
+                    if (val >= 300 && val <= 1000) {
+                        status = '✓ Tốt';
+                        statusClass = 'status-good';
+                    } else if (val >= 200 && val <= 1300) {
+                        status = '⚠ Cảnh báo';
+                        statusClass = 'status-warning';
+                    } else {
+                        status = '✗ Nguy hiểm';
+                        statusClass = 'status-danger';
+                    }
+                    break;
+                case 'temp':
+                    if (val >= 20 && val <= 28) {
+                        status = '✓ Tốt';
+                        statusClass = 'status-good';
+                    } else if (val >= 15 && val <= 30) {
+                        status = '⚠ Cảnh báo';
+                        statusClass = 'status-warning';
+                    } else {
+                        status = '✗ Nguy hiểm';
+                        statusClass = 'status-danger';
+                    }
+                    break;
+            }
+
+            const statusEl = document.getElementById(sensor + 'Status');
+            if (statusEl) {
+                statusEl.innerHTML = status;
+                statusEl.className = 'sensor-status ' + statusClass;
+            }
+        }
+
+        // Hàm thêm vào lịch sử
+        function addToHistory(sensor, value) {
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ':' + 
+                           now.getMinutes().toString().padStart(2, '0');
+            
+            dataHistory[sensor].push({
+                time: timeStr,
+                value: parseFloat(value)
+            });
+
+            // Giữ tối đa 24 giá trị
+            if (dataHistory[sensor].length > 24) {
+                dataHistory[sensor].shift();
+            }
+        }
+
+        // Khái niệm cảm biến (Tối ưu cho Cá Chép)
+        const concepts = {
+            ph: {
+                title: 'pH - Độ Axit/Kiềm',
+                description: 'pH đo độ axit hoặc kiềm của nước. Cá chép thích sống trong môi trường kiềm nhẹ với pH 7.0-8.5. Đây là loài cá thích nước kiềm hơn so với nhiều loài cá khác. Nếu pH quá thấp (axit), cá chép sẽ bị stress và dễ mắc bệnh. Nếu pH quá cao (>9), có thể gây độc cho cá.'
+            },
+            do: {
+                title: 'DO - Oxy Hòa Tan',
+                description: 'DO (Dissolved Oxygen) là lượng oxy hòa tan trong nước. Cá chép cần ít nhất 4-5 mg/L để sinh trưởng, nhưng mức lý tưởng là 5-8 mg/L. Cá chép có thể chịu đựng được mức DO thấp hơn nhiều loài cá khác, nhưng để phát triển tốt nhất vẫn cần đủ oxy. Sử dụng máy sục khí để duy trì DO.'
+            },
+            ec: {
+                title: 'EC - Độ Dẫn Điện',
+                description: 'EC (Electrical Conductivity) đo nồng độ muối/chất dinh dưỡng trong nước. Cá chép thích nước ngọt với EC thấp đến trung bình (0.5-1.5 mS/cm). EC quá cao có thể gây stress và ảnh hưởng đến khả năng hấp thụ nước của cá chép. Cá chép là loài nước ngọt nên không cần EC cao.'
+            },
+            tds: {
+                title: 'TDS - Tổng Chất Rắn Hòa Tan',
+                description: 'TDS (Total Dissolved Solids) là tổng lượng chất rắn hòa tan trong nước, thường tính bằng ppm. Cá chép thích môi trường nước ngọt với TDS từ 300-1000 ppm. TDS cao quá có thể gây độc cho cá chép, thấp quá thì cá sẽ thiếu khoáng chất cần thiết. Duy trì TDS ổn định cho sức khỏe tốt.'
+            },
+            temp: {
+                title: 'TO - Nhiệt Độ Nước',
+                description: 'Nhiệt độ nước ảnh hưởng lớn đến sức khỏe cá chép. Cá chép phát triển tốt nhất ở 20-28°C, có thể chịu được từ 15-30°C. Cá chép là loài cá nước lạnh, có thể sống ở nhiệt độ thấp hơn nhiều loài cá nhiệt đới. Nhiệt độ quá cao (>30°C) sẽ giảm DO và gây stress cho cá.'
+            }
+        };
+
+        // Hàm hiển thị chi tiết cảm biến
+        function showSensorDetail(sensor) {
+            const modal = document.getElementById('sensorModal');
+            const title = document.getElementById('modalTitle');
+            const subtitle = document.getElementById('modalSubtitle');
+            const conceptBox = document.getElementById('conceptBox');
+            const dataTableBody = document.getElementById('dataTableBody');
+
+            title.textContent = concepts[sensor].title;
+            subtitle.textContent = 'Giá trị hiện tại: ' + (currentValues[sensor] || '--');
+
+            conceptBox.innerHTML = `
+                <h3>${concepts[sensor].title}</h3>
+                <p>${concepts[sensor].description}</p>
+            `;
+
+            // Hiển thị bảng dữ liệu (Điều kiện cho Cá Chép)
+            dataTableBody.innerHTML = '';
+            dataHistory[sensor].forEach((item, index) => {
+                const row = document.createElement('tr');
+                let status = '';
+                
+                if (sensor === 'ph') {
+                    status = (item.value >= 7.0 && item.value <= 8.5) ? '✓ Tốt' : 
+                             (item.value >= 6.5 && item.value <= 9.0) ? '⚠ Cảnh báo' : '✗ Nguy hiểm';
+                } else if (sensor === 'do') {
+                    status = (item.value >= 5.0 && item.value <= 8.0) ? '✓ Tốt' : 
+                             (item.value >= 4.0) ? '⚠ Cảnh báo' : '✗ Nguy hiểm';
+                } else if (sensor === 'ec') {
+                    status = (item.value >= 0.5 && item.value <= 1.5) ? '✓ Tốt' : 
+                             (item.value >= 0.3 && item.value <= 2.0) ? '⚠ Cảnh báo' : '✗ Nguy hiểm';
+                } else if (sensor === 'tds') {
+                    status = (item.value >= 300 && item.value <= 1000) ? '✓ Tốt' : 
+                             (item.value >= 200 && item.value <= 1300) ? '⚠ Cảnh báo' : '✗ Nguy hiểm';
+                } else if (sensor === 'temp') {
+                    status = (item.value >= 20 && item.value <= 28) ? '✓ Tốt' : 
+                             (item.value >= 15 && item.value <= 30) ? '⚠ Cảnh báo' : '✗ Nguy hiểm';
+                }
+
+                row.innerHTML = `
+                    <td>${item.time}</td>
+                    <td>${item.value.toFixed(2)}</td>
+                    <td>${status}</td>
+                `;
+                dataTableBody.appendChild(row);
+            });
+
+            // Vẽ biểu đồ
+            drawChart(sensor);
+
+            modal.style.display = 'block';
+        }
+
+        // Hàm vẽ biểu đồ
+        let chart = null;
+        function drawChart(sensor) {
+            const ctx = document.getElementById('sensorChart').getContext('2d');
+            
+            if (chart) {
+                chart.destroy();
+            }
+
+            const labels = dataHistory[sensor].map(item => item.time);
+            const data = dataHistory[sensor].map(item => item.value);
+
+            let minValue = 0, maxValue = 10;
+            if (sensor === 'ph') { minValue = 5; maxValue = 9; }
+            else if (sensor === 'do') { minValue = 0; maxValue = 12; }
+            else if (sensor === 'ec') { minValue = 0; maxValue = 3; }
+            else if (sensor === 'tds') { minValue = 0; maxValue = 2000; }
+            else if (sensor === 'temp') { minValue = 15; maxValue = 40; }
+
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: concepts[sensor].title,
+                        data: data,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#667eea',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                font: { size: 12 }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: minValue,
+                            max: maxValue
+                        }
+                    }
+                }
+            });
+        }
+
+        // Hàm hiển thị phân tích
+        function showAnalysis() {
+            const modal = document.getElementById('analysisModal');
+            const tableBody = document.getElementById('analysisTableBody');
+
+            tableBody.innerHTML = '';
+
+            const sensors = [
+                { key: 'ph', name: 'pH', unit: '' },
+                { key: 'do', name: 'DO', unit: 'mg/L' },
+                { key: 'ec', name: 'EC', unit: 'mS/cm' },
+                { key: 'tds', name: 'TDS', unit: 'ppm' },
+                { key: 'temp', name: 'TO', unit: '°C' }
+            ];
+
+            sensors.forEach(sensor => {
+                const value = currentValues[sensor.key];
+                if (value === null) return;
+
+                let status = '';
+                let statusBadge = '';
+                let recommendation = '';
+
+                // Điều kiện phân tích cho Cá Chép
+                if (sensor.key === 'ph') {
+                    if (value >= 7.0 && value <= 8.5) {
+                        status = 'Tốt';
+                        statusBadge = 'badge-good';
+                        recommendation = 'Độ pH lý tưởng cho cá chép. Duy trì mức này và kiểm tra định kỳ hàng ngày.';
+                    } else if (value >= 6.5 && value <= 9.0) {
+                        status = 'Cảnh báo';
+                        statusBadge = 'badge-warning';
+                        recommendation = 'pH nằm ngoài khoảng tối ưu. Cá chép thích nước kiềm nhẹ (7.0-8.5). Điều chỉnh từ từ.';
+                    } else {
+                        status = 'Nguy hiểm';
+                        statusBadge = 'badge-danger';
+                        recommendation = 'pH quá cao hoặc quá thấp. Cá chép có thể bị stress. Cần điều chỉnh ngay lập tức.';
+                    }
+                } else if (sensor.key === 'do') {
+                    if (value >= 5.0 && value <= 8.0) {
+                        status = 'Tốt';
+                        statusBadge = 'badge-good';
+                        recommendation = 'Nồng độ oxy hòa tan lý tưởng cho cá chép. Tiếp tục sục khí bình thường.';
+                    } else if (value >= 4.0) {
+                        status = 'Cảnh báo';
+                        statusBadge = 'badge-warning';
+                        recommendation = 'DO thấp hơn mức tối ưu. Cá chép cần ít nhất 5 mg/L. Tăng tốc độ sục khí.';
+                    } else {
+                        status = 'Nguy hiểm';
+                        statusBadge = 'badge-danger';
+                        recommendation = 'DO rất thấp! Cá chép có thể bị ngạt và chết. Tăng sục khí ngay lập tức.';
+                    }
+                } else if (sensor.key === 'ec') {
+                    if (value >= 0.5 && value <= 1.5) {
+                        status = 'Tốt';
+                        statusBadge = 'badge-good';
+                        recommendation = 'EC phù hợp cho cá chép. Cá chép ưa thích nước có độ dẫn điện thấp đến trung bình.';
+                    } else if (value >= 0.3 && value <= 2.0) {
+                        status = 'Cảnh báo';
+                        statusBadge = 'badge-warning';
+                        recommendation = 'EC hơi lệch khỏi mức tối ưu. Thay nước một phần nếu EC quá cao.';
+                    } else {
+                        status = 'Nguy hiểm';
+                        statusBadge = 'badge-danger';
+                        recommendation = 'EC quá cao hoặc quá thấp. Cá chép có thể bị stress. Cần điều chỉnh ngay.';
+                    }
+                } else if (sensor.key === 'tds') {
+                    if (value >= 300 && value <= 1000) {
+                        status = 'Tốt';
+                        statusBadge = 'badge-good';
+                        recommendation = 'TDS lý tưởng cho cá chép. Cá chép thích nước có độ mặn thấp đến trung bình.';
+                    } else if (value >= 200 && value <= 1300) {
+                        status = 'Cảnh báo';
+                        statusBadge = 'badge-warning';
+                        recommendation = 'TDS nằm ngoài phạm vi tối ưu. Thay nước một phần để điều chỉnh.';
+                    } else {
+                        status = 'Nguy hiểm';
+                        statusBadge = 'badge-danger';
+                        recommendation = 'TDS quá cao hoặc quá thấp. Có thể gây độc cho cá chép. Cần điều chỉnh ngay.';
+                    }
+                } else if (sensor.key === 'temp') {
+                    if (value >= 20 && value <= 28) {
+                        status = 'Tốt';
+                        statusBadge = 'badge-good';
+                        recommendation = 'Nhiệt độ lý tưởng cho cá chép. Cá chép phát triển tốt nhất ở 20-28°C.';
+                    } else if (value >= 15 && value <= 30) {
+                        status = 'Cảnh báo';
+                        statusBadge = 'badge-warning';
+                        recommendation = 'Nhiệt độ hơi lệch. Cá chép có thể chịu được nhưng tăng trưởng sẽ chậm. Điều chỉnh nhiệt độ.';
+                    } else {
+                        status = 'Nguy hiểm';
+                        statusBadge = 'badge-danger';
+                        recommendation = 'Nhiệt độ quá nóng hoặc quá lạnh. Cá chép có thể bị sốc nhiệt. Cần điều chỉnh ngay.';
+                    }
+                }
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${sensor.name}</strong></td>
+                    <td>${value.toFixed(2)} ${sensor.unit}</td>
+                    <td><span class="status-badge ${statusBadge}">${status}</span></td>
+                    <td><div class="recommendation">${recommendation}</div></td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            modal.style.display = 'block';
+        }
+
+        // Hàm đóng modal
+        function closeSensorModal() {
+            document.getElementById('sensorModal').style.display = 'none';
+        }
+
+        function closeAnalysisModal() {
+            document.getElementById('analysisModal').style.display = 'none';
+        }
+
+        // Đóng modal khi click ngoài
+        window.onclick = function(event) {
+            const sensorModal = document.getElementById('sensorModal');
+            const analysisModal = document.getElementById('analysisModal');
+            
+            if (event.target === sensorModal) {
+                sensorModal.style.display = 'none';
+            }
+            if (event.target === analysisModal) {
+                analysisModal.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>
-
-

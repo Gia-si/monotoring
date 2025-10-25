@@ -121,15 +121,18 @@
         }
 
         .btn-analyze {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: white;
+            color: #667eea;
             flex: 1;
             min-width: 200px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            border: 3px solid #764ba2;
         }
 
         .btn-analyze:hover {
             transform: scale(1.05);
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            background: #f0f4ff;
         }
 
         /* Modal */
@@ -335,8 +338,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🌱 TOSI Aquaponics</h1>
-            <p>Hệ thống giám sát cảm biến thời gian thực</p>
+            <h1>🐟 TOSI Aquaponics - Cá Chép</h1>
+            <p>Hệ thống giám sát cảm biến thời gian thực cho nuôi Cá Chép</p>
         </div>
 
         <div class="controls">
@@ -531,7 +534,7 @@
             },
         });
 
-        // Hàm cập nhật trạng thái
+        // Hàm cập nhật trạng thái (Điều kiện cho Cá Chép)
         function updateStatus(sensor, value) {
             const val = parseFloat(value);
             let status = '';
@@ -539,10 +542,10 @@
 
             switch(sensor) {
                 case 'ph':
-                    if (val >= 6.5 && val <= 7.5) {
+                    if (val >= 7.0 && val <= 8.5) {
                         status = '✓ Tốt';
                         statusClass = 'status-good';
-                    } else if (val >= 6 && val <= 8) {
+                    } else if (val >= 6.5 && val <= 9.0) {
                         status = '⚠ Cảnh báo';
                         statusClass = 'status-warning';
                     } else {
@@ -551,10 +554,10 @@
                     }
                     break;
                 case 'do':
-                    if (val >= 5) {
+                    if (val >= 5.0 && val <= 8.0) {
                         status = '✓ Tốt';
                         statusClass = 'status-good';
-                    } else if (val >= 3) {
+                    } else if (val >= 4.0) {
                         status = '⚠ Cảnh báo';
                         statusClass = 'status-warning';
                     } else {
@@ -563,10 +566,10 @@
                     }
                     break;
                 case 'ec':
-                    if (val >= 1.2 && val <= 2.0) {
+                    if (val >= 0.5 && val <= 1.5) {
                         status = '✓ Tốt';
                         statusClass = 'status-good';
-                    } else if (val >= 0.8 && val <= 2.5) {
+                    } else if (val >= 0.3 && val <= 2.0) {
                         status = '⚠ Cảnh báo';
                         statusClass = 'status-warning';
                     } else {
@@ -575,10 +578,10 @@
                     }
                     break;
                 case 'tds':
-                    if (val >= 600 && val <= 1200) {
+                    if (val >= 300 && val <= 1000) {
                         status = '✓ Tốt';
                         statusClass = 'status-good';
-                    } else if (val >= 400 && val <= 1500) {
+                    } else if (val >= 200 && val <= 1300) {
                         status = '⚠ Cảnh báo';
                         statusClass = 'status-warning';
                     } else {
@@ -587,10 +590,10 @@
                     }
                     break;
                 case 'temp':
-                    if (val >= 25 && val <= 30) {
+                    if (val >= 20 && val <= 28) {
                         status = '✓ Tốt';
                         statusClass = 'status-good';
-                    } else if (val >= 20 && val <= 35) {
+                    } else if (val >= 15 && val <= 30) {
                         status = '⚠ Cảnh báo';
                         statusClass = 'status-warning';
                     } else {
@@ -624,27 +627,27 @@
             }
         }
 
-        // Khái niệm cảm biến
+        // Khái niệm cảm biến (Tối ưu cho Cá Chép)
         const concepts = {
             ph: {
                 title: 'pH - Độ Axit/Kiềm',
-                description: 'pH đo độ axit hoặc kiềm của nước. Trong aquaponics, pH lý tưởng là 6.8-7.0 để cân bằng giữa cá và cây. Nếu pH quá thấp (axit), cá sẽ bị stress. Nếu quá cao (kiềm), các chất dinh dưỡng sẽ không được hấp thụ tốt.'
+                description: 'pH đo độ axit hoặc kiềm của nước. Cá chép thích sống trong môi trường kiềm nhẹ với pH 7.0-8.5. Đây là loài cá thích nước kiềm hơn so với nhiều loài cá khác. Nếu pH quá thấp (axit), cá chép sẽ bị stress và dễ mắc bệnh. Nếu pH quá cao (>9), có thể gây độc cho cá.'
             },
             do: {
                 title: 'DO - Oxy Hòa Tan',
-                description: 'DO (Dissolved Oxygen) là lượng oxy hòa tan trong nước. Cá cần oxy để sống, thường cần từ 5-8 mg/L. Nếu DO quá thấp, cá sẽ bị ngạt và có thể chết. Cần sử dụng máy sục khí để tăng DO.'
+                description: 'DO (Dissolved Oxygen) là lượng oxy hòa tan trong nước. Cá chép cần ít nhất 4-5 mg/L để sinh trưởng, nhưng mức lý tưởng là 5-8 mg/L. Cá chép có thể chịu đựng được mức DO thấp hơn nhiều loài cá khác, nhưng để phát triển tốt nhất vẫn cần đủ oxy. Sử dụng máy sục khí để duy trì DO.'
             },
             ec: {
                 title: 'EC - Độ Dẫn Điện',
-                description: 'EC (Electrical Conductivity) đo nồng độ muối/chất dinh dưỡng trong nước. Trong aquaponics, EC lý tưởng là 1.2-2.0 mS/cm. EC quá cao có thể gây độc cho cá và cây, quá thấp thì cây sẽ thiếu dinh dưỡng.'
+                description: 'EC (Electrical Conductivity) đo nồng độ muối/chất dinh dưỡng trong nước. Cá chép thích nước ngọt với EC thấp đến trung bình (0.5-1.5 mS/cm). EC quá cao có thể gây stress và ảnh hưởng đến khả năng hấp thụ nước của cá chép. Cá chép là loài nước ngọt nên không cần EC cao.'
             },
             tds: {
                 title: 'TDS - Tổng Chất Rắn Hòa Tan',
-                description: 'TDS (Total Dissolved Solids) là tổng lượng chất rắn hòa tan trong nước, thường tính bằng ppm. Trong aquaponics, TDS lý tưởng là 600-1200 ppm. TDS cao quá có thể gây độc, thấp quá thì thiếu dinh dưỡng.'
+                description: 'TDS (Total Dissolved Solids) là tổng lượng chất rắn hòa tan trong nước, thường tính bằng ppm. Cá chép thích môi trường nước ngọt với TDS từ 300-1000 ppm. TDS cao quá có thể gây độc cho cá chép, thấp quá thì cá sẽ thiếu khoáng chất cần thiết. Duy trì TDS ổn định cho sức khỏe tốt.'
             },
             temp: {
                 title: 'TO - Nhiệt Độ Nước',
-                description: 'Nhiệt độ nước ảnh hưởng đến tốc độ trao đổi chất của cá và cây. Nhiệt độ lý tưởng là 25-30°C. Nếu quá lạnh, cá sẽ ăn ít và tăng trưởng chậm. Nếu quá nóng, DO sẽ giảm và cá sẽ bị stress.'
+                description: 'Nhiệt độ nước ảnh hưởng lớn đến sức khỏe cá chép. Cá chép phát triển tốt nhất ở 20-28°C, có thể chịu được từ 15-30°C. Cá chép là loài cá nước lạnh, có thể sống ở nhiệt độ thấp hơn nhiều loài cá nhiệt đới. Nhiệt độ quá cao (>30°C) sẽ giảm DO và gây stress cho cá.'
             }
         };
 
@@ -664,27 +667,27 @@
                 <p>${concepts[sensor].description}</p>
             `;
 
-            // Hiển thị bảng dữ liệu
+            // Hiển thị bảng dữ liệu (Điều kiện cho Cá Chép)
             dataTableBody.innerHTML = '';
             dataHistory[sensor].forEach((item, index) => {
                 const row = document.createElement('tr');
                 let status = '';
                 
                 if (sensor === 'ph') {
-                    status = (item.value >= 6.5 && item.value <= 7.5) ? '✓ Tốt' : 
-                             (item.value >= 6 && item.value <= 8) ? '⚠ Cảnh báo' : '✗ Nguy hiểm';
+                    status = (item.value >= 7.0 && item.value <= 8.5) ? '✓ Tốt' : 
+                             (item.value >= 6.5 && item.value <= 9.0) ? '⚠ Cảnh báo' : '✗ Nguy hiểm';
                 } else if (sensor === 'do') {
-                    status = (item.value >= 5) ? '✓ Tốt' : 
-                             (item.value >= 3) ? '⚠ Cảnh báo' : '✗ Nguy hiểm';
+                    status = (item.value >= 5.0 && item.value <= 8.0) ? '✓ Tốt' : 
+                             (item.value >= 4.0) ? '⚠ Cảnh báo' : '✗ Nguy hiểm';
                 } else if (sensor === 'ec') {
-                    status = (item.value >= 1.2 && item.value <= 2.0) ? '✓ Tốt' : 
-                             (item.value >= 0.8 && item.value <= 2.5) ? '⚠ Cảnh báo' : '✗ Nguy hiểm';
+                    status = (item.value >= 0.5 && item.value <= 1.5) ? '✓ Tốt' : 
+                             (item.value >= 0.3 && item.value <= 2.0) ? '⚠ Cảnh báo' : '✗ Nguy hiểm';
                 } else if (sensor === 'tds') {
-                    status = (item.value >= 600 && item.value <= 1200) ? '✓ Tốt' : 
-                             (item.value >= 400 && item.value <= 1500) ? '⚠ Cảnh báo' : '✗ Nguy hiểm';
+                    status = (item.value >= 300 && item.value <= 1000) ? '✓ Tốt' : 
+                             (item.value >= 200 && item.value <= 1300) ? '⚠ Cảnh báo' : '✗ Nguy hiểm';
                 } else if (sensor === 'temp') {
-                    status = (item.value >= 25 && item.value <= 30) ? '✓ Tốt' : 
-                             (item.value >= 20 && item.value <= 35) ? '⚠ Cảnh báo' : '✗ Nguy hiểm';
+                    status = (item.value >= 20 && item.value <= 28) ? '✓ Tốt' : 
+                             (item.value >= 15 && item.value <= 30) ? '⚠ Cảnh báo' : '✗ Nguy hiểm';
                 }
 
                 row.innerHTML = `
@@ -783,75 +786,76 @@
                 let statusBadge = '';
                 let recommendation = '';
 
+                // Điều kiện phân tích cho Cá Chép
                 if (sensor.key === 'ph') {
-                    if (value >= 6.5 && value <= 7.5) {
+                    if (value >= 7.0 && value <= 8.5) {
                         status = 'Tốt';
                         statusBadge = 'badge-good';
-                        recommendation = 'Duy trì pH hiện tại. Kiểm tra định kỳ hàng ngày.';
-                    } else if (value >= 6 && value <= 8) {
-                        status = 'Cảnh báo';
+                        recommendation = 'Độ pH lý tưởng cho cá chép. Duy trì mức này và kiểm tra định kỳ hàng ngày.';
+                    } else if (value >= 9.0) {
+                        status = 'Nguy hiểm';
                         statusBadge = 'badge-warning';
-                        recommendation = 'pH hơi lệch. Điều chỉnh bằng cách thêm acid hoặc base từ từ.';
-                    } else {
+                        recommendation = 'PH Cao: Dùng dung dịch giảm PH, trộn 1 ít nước dầu, thay đổi giá thể.';
+                    } else if (value <= 6.5) {
                         status = 'Nguy hiểm';
                         statusBadge = 'badge-danger';
-                        recommendation = 'pH quá cao hoặc quá thấp. Cần điều chỉnh ngay lập tức.';
+                        recommendation = 'pH quá thấp. Cá chép có thể bị stress. Bổ sung Canxi, Kali,.. Lưu ý tăng từ từ: 0,2 -> 0,3 / 1 ngày.';
                     }
                 } else if (sensor.key === 'do') {
-                    if (value >= 5) {
+                    if (value >= 5.0 && value <= 8.0) {
                         status = 'Tốt';
                         statusBadge = 'badge-good';
-                        recommendation = 'DO đủ cho cá. Tiếp tục sục khí bình thường.';
-                    } else if (value >= 3) {
-                        status = 'Cảnh báo';
+                        recommendation = 'Nồng độ oxy hòa tan lý tưởng cho cá chép. Tiếp tục sục khí bình thường.';
+                    } else if (value <= 4.5) {
+                        status = 'Nguy hiểm';
                         statusBadge = 'badge-warning';
-                        recommendation = 'DO thấp. Tăng tốc độ sục khí hoặc kiểm tra máy sục.';
-                    } else {
+                        recommendation = 'DO Thấp: Tăng cường sục khí, giảm nhiệt nước nếu quá cao, giảm mật độ cá nếu quá dày.';
+                    } else if(value > 10) {
                         status = 'Nguy hiểm';
                         statusBadge = 'badge-danger';
-                        recommendation = 'DO rất thấp. Cá có thể bị ngạt. Tăng sục khí ngay.';
+                        recommendation = 'DO Thấp: Tăng cường sục khí, giảm nhiệt nước nếu quá cao, giảm mật độ cá nếu quá dày';
                     }
                 } else if (sensor.key === 'ec') {
-                    if (value >= 1.2 && value <= 2.0) {
+                    if (value >= 0.5 && value <= 1.5) {
                         status = 'Tốt';
                         statusBadge = 'badge-good';
-                        recommendation = 'EC lý tưởng. Duy trì mức hiện tại.';
-                    } else if (value >= 0.8 && value <= 2.5) {
-                        status = 'Cảnh báo';
+                        recommendation = 'EC phù hợp cho cá chép. Cá chép ưa thích nước có độ dẫn điện thấp đến trung bình.';
+                    } else if (value < 0.5) {
+                        status = 'Nguy hiểm';
                         statusBadge = 'badge-warning';
-                        recommendation = 'EC hơi lệch. Thay nước một phần hoặc thêm dinh dưỡng.';
-                    } else {
+                        recommendation = 'EC Thấp: Bổ sung khoáng chất: Canxi, Kali, sắt... và vi lượng cho nước';
+                    } else if (value > 1.5) {
                         status = 'Nguy hiểm';
                         statusBadge = 'badge-danger';
-                        recommendation = 'EC quá cao hoặc quá thấp. Cần điều chỉnh ngay.';
+                        recommendation = 'EC Thấp: Bổ sung khoáng chất: Canxi, Kali, sắt... và vi lượng cho nước';
                     }
                 } else if (sensor.key === 'tds') {
-                    if (value >= 600 && value <= 1200) {
+                    if (value >= 300 && value <= 1000) {
                         status = 'Tốt';
                         statusBadge = 'badge-good';
-                        recommendation = 'TDS lý tưởng. Duy trì mức hiện tại.';
-                    } else if (value >= 400 && value <= 1500) {
-                        status = 'Cảnh báo';
+                        recommendation = 'TDS lý tưởng cho cá chép. Cá chép thích nước có độ mặn thấp đến trung bình.';
+                    } else if (value < 300) {
+                        status = Nguy hiểm';
                         statusBadge = 'badge-warning';
-                        recommendation = 'TDS hơi lệch. Thay nước một phần để cân bằng.';
-                    } else {
+                        recommendation = 'TDS Thấp: Bổ sung khoáng chất: Canxi, Kali, Magie... (Theo dõi tránh TDS tăng nhanh).';
+                    } else if(value > 1100)  {
                         status = 'Nguy hiểm';
                         statusBadge = 'badge-danger';
-                        recommendation = 'TDS quá cao hoặc quá thấp. Cần điều chỉnh ngay.';
+                        recommendation = 'TDS Cao: Thay một phần nước bằng nước lọc hoặc nước mưa an toàn để pha loãng; có thể vệ sinh hệ thống';
                     }
                 } else if (sensor.key === 'temp') {
-                    if (value >= 25 && value <= 30) {
+                    if (value >= 20 && value <= 28) {
                         status = 'Tốt';
                         statusBadge = 'badge-good';
-                        recommendation = 'Nhiệt độ lý tưởng. Duy trì mức hiện tại.';
-                    } else if (value >= 20 && value <= 35) {
-                        status = 'Cảnh báo';
+                        recommendation = 'Nhiệt độ lý tưởng cho cá chép. Cá chép phát triển tốt nhất ở 20-28°C.';
+                    } else if (value < 18) {
+                        status = 'Nguy hiểm';
                         statusBadge = 'badge-warning';
-                        recommendation = 'Nhiệt độ hơi lệch. Kiểm tra hệ thống làm mát/sưởi.';
-                    } else {
+                        recommendation = 'Nhiệt hơi thấp. Điều chỉnh nhiệt độ bằng máy sưởi.';
+                    } else if(value > 30) {
                         status = 'Nguy hiểm';
                         statusBadge = 'badge-danger';
-                        recommendation = 'Nhiệt độ quá cao hoặc quá thấp. Cần điều chỉnh ngay.';
+                        recommendation = 'Nhiệt độ quá lạnh. Cá chép có thể bị sốc nhiệt. Điều chỉnh nhiệt độ bằng máy sưởi.';
                     }
                 }
 

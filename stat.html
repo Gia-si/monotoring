@@ -440,21 +440,18 @@
     <!-- ERA Widget Script -->
     <script src="https://www.unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
     <script>
-        // Liên kết phần tử HTML hiển thị dữ liệu cảm biến
         const phValue = document.getElementById('phValue');
         const doValue = document.getElementById('doValue');
         const ecValue = document.getElementById('ecValue');
         const tdsValue = document.getElementById('tdsValue');
         const tempValue = document.getElementById('tempValue');
 
-        // Biến lưu cấu hình từng cảm biến
         let configPh = null,
             configDo = null,
             configEc = null,
             configTds = null,
             configTemp = null;
 
-        // Biến lưu giá trị hiện tại
         let currentValues = {
             ph: null,
             do: null,
@@ -463,7 +460,6 @@
             temp: null
         };
 
-        // Biến lưu lịch sử dữ liệu (24 giá trị gần nhất)
         let dataHistory = {
             ph: [],
             do: [],
@@ -472,7 +468,6 @@
             temp: []
         };
 
-        // Khởi tạo ERA Widget
         const eraWidget = new EraWidget();
         eraWidget.init({
             needRealtimeConfigs: true,
@@ -482,7 +477,6 @@
             minRealtimeConfigsCount: 0,
 
             onConfiguration: (configuration) => {
-                // Giả định thứ tự cấu hình trong ERA: 0: pH, 1: DO, 2: EC, 3: TDS, 4: Water Temp
                 configPh   = configuration.realtime_configs[0];
                 configDo   = configuration.realtime_configs[1];
                 configEc   = configuration.realtime_configs[2];
@@ -493,7 +487,6 @@
             },
 
             onValues: (values) => {
-                // Cập nhật giá trị hiện tại
                 if (configPh && values[configPh.id]) {
                     const phVal = values[configPh.id].value.toFixed(2);
                     phValue.innerHTML = phVal;
@@ -534,7 +527,6 @@
             },
         });
 
-        // Hàm cập nhật trạng thái (Điều kiện cho Cá Chép)
         function updateStatus(sensor, value) {
             const val = parseFloat(value);
             let status = '';
@@ -610,7 +602,6 @@
             }
         }
 
-        // Hàm thêm vào lịch sử
         function addToHistory(sensor, value) {
             const now = new Date();
             const timeStr = now.getHours().toString().padStart(2, '0') + ':' + 
@@ -621,13 +612,11 @@
                 value: parseFloat(value)
             });
 
-            // Giữ tối đa 24 giá trị
             if (dataHistory[sensor].length > 24) {
                 dataHistory[sensor].shift();
             }
         }
 
-        // Khái niệm cảm biến (Tối ưu cho Cá Chép)
         const concepts = {
             ph: {
                 title: 'pH - Độ Axit/Kiềm',
@@ -651,7 +640,6 @@
             }
         };
 
-        // Hàm hiển thị chi tiết cảm biến
         function showSensorDetail(sensor) {
             const modal = document.getElementById('sensorModal');
             const title = document.getElementById('modalTitle');
@@ -667,7 +655,6 @@
                 <p>${concepts[sensor].description}</p>
             `;
 
-            // Hiển thị bảng dữ liệu (Điều kiện cho Cá Chép)
             dataTableBody.innerHTML = '';
             dataHistory[sensor].forEach((item, index) => {
                 const row = document.createElement('tr');
@@ -698,13 +685,10 @@
                 dataTableBody.appendChild(row);
             });
 
-            // Vẽ biểu đồ
             drawChart(sensor);
-
             modal.style.display = 'block';
         }
 
-        // Hàm vẽ biểu đồ
         let chart = null;
         function drawChart(sensor) {
             const ctx = document.getElementById('sensorChart').getContext('2d');
@@ -717,29 +701,93 @@
             const data = dataHistory[sensor].map(item => item.value);
 
             let minValue = 0, maxValue = 10;
-            if (sensor === 'ph') { minValue = 5; maxValue = 9; }
-            else if (sensor === 'do') { minValue = 0; maxValue = 12; }
-            else if (sensor === 'ec') { minValue = 0; maxValue = 3; }
-            else if (sensor === 'tds') { minValue = 0; maxValue = 2000; }
-            else if (sensor === 'temp') { minValue = 15; maxValue = 40; }
+            let thresholdHigh = null, thresholdLow = null;
+            let chartColor = '#667eea';
+            
+            if (sensor === 'ph') { 
+                minValue = 5; 
+                maxValue = 9;
+                thresholdHigh = 8.5;
+                thresholdLow = 7.0;
+                chartColor = '#FF6B6B';
+            }
+            else if (sensor === 'do') { 
+                minValue = 0; 
+                maxValue = 12;
+                thresholdHigh = 8.0;
+                thresholdLow = 5.0;
+                chartColor = '#4ECDC4';
+            }
+            else if (sensor === 'ec') { 
+                minValue = 0; 
+                maxValue = 3;
+                thresholdHigh = 1.5;
+                thresholdLow = 0.5;
+                chartColor = '#45B7D1';
+            }
+            else if (sensor === 'tds') { 
+                minValue = 0; 
+                maxValue = 2000;
+                thresholdHigh = 1000;
+                thresholdLow = 300;
+                chartColor = '#FFA07A';
+            }
+            else if (sensor === 'temp') { 
+                minValue = 15; 
+                maxValue = 40;
+                thresholdHigh = 28;
+                thresholdLow = 20;
+                chartColor = '#FFD93D';
+            }
+
+            const datasets = [
+                {
+                    label: concepts[sensor].title,
+                    data: data,
+                    borderColor: chartColor,
+                    backgroundColor: chartColor + '33',
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: chartColor,
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 6
+                }
+            ];
+
+            if (thresholdHigh !== null) {
+                datasets.push({
+                    label: `Ngưỡng cao (${thresholdHigh})`,
+                    data: Array(labels.length).fill(thresholdHigh),
+                    borderColor: 'rgba(255, 0, 0, 0.6)',
+                    borderDash: [5, 5],
+                    borderWidth: 1.5,
+                    pointRadius: 0,
+                    fill: false,
+                    tension: 0
+                });
+            }
+
+            if (thresholdLow !== null) {
+                datasets.push({
+                    label: `Ngưỡng thấp (${thresholdLow})`,
+                    data: Array(labels.length).fill(thresholdLow),
+                    borderColor: 'rgba(0, 150, 255, 0.6)',
+                    borderDash: [5, 5],
+                    borderWidth: 1.5,
+                    pointRadius: 0,
+                    fill: false,
+                    tension: 0
+                });
+            }
 
             chart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
-                    datasets: [{
-                        label: concepts[sensor].title,
-                        data: data,
-                        borderColor: '#667eea',
-                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 4,
-                        pointBackgroundColor: '#667eea',
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2
-                    }]
+                    datasets: datasets
                 },
                 options: {
                     responsive: true,
@@ -748,22 +796,36 @@
                         legend: {
                             display: true,
                             labels: {
-                                font: { size: 12 }
+                                font: { size: 12 },
+                                usePointStyle: true,
+                                boxWidth: 8,
+                                padding: 15
                             }
+                        },
+                        tooltip: {
+                            enabled: true,
+                            backgroundColor: 'rgba(0,0,0,0.75)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff',
+                            padding: 12,
+                            borderRadius: 6
                         }
                     },
                     scales: {
                         y: {
                             beginAtZero: false,
                             min: minValue,
-                            max: maxValue
+                            max: maxValue,
+                            grid: { color: '#eef2f6' }
+                        },
+                        x: {
+                            grid: { display: false }
                         }
                     }
                 }
             });
         }
 
-        // Hàm hiển thị phân tích
         function showAnalysis() {
             const modal = document.getElementById('analysisModal');
             const tableBody = document.getElementById('analysisTableBody');
@@ -786,76 +848,75 @@
                 let statusBadge = '';
                 let recommendation = '';
 
-                // Điều kiện phân tích cho Cá Chép
                 if (sensor.key === 'ph') {
                     if (value >= 7.0 && value <= 8.5) {
                         status = 'Tốt';
                         statusBadge = 'badge-good';
                         recommendation = 'Độ pH lý tưởng cho cá chép. Duy trì mức này và kiểm tra định kỳ hàng ngày.';
-                    } else if (value >= 6.5 && value <= 9.0) {
-                        status = 'Cảnh báo';
-                        statusBadge = 'badge-warning';
-                        recommendation = 'pH nằm ngoài khoảng tối ưu. Cá chép thích nước kiềm nhẹ (7.0-8.5). Điều chỉnh từ từ.';
-                    } else {
+                    } else if (value >= 9.0) {
                         status = 'Nguy hiểm';
                         statusBadge = 'badge-danger';
-                        recommendation = 'pH quá cao hoặc quá thấp. Cá chép có thể bị stress. Cần điều chỉnh ngay lập tức.';
+                        recommendation = 'pH Cao: Dùng dung dịch giảm pH, trộn 1 ít nước dầu, thay đổi giá thể.';
+                    } else if (value <= 6.5) {
+                        status = 'Nguy hiểm';
+                        statusBadge = 'badge-danger';
+                        recommendation = 'pH quá thấp. Cá chép có thể bị stress. Bổ sung Canxi, Kali,.. Lưu ý tăng từ từ: 0,2 → 0,3 / 1 ngày.';
                     }
                 } else if (sensor.key === 'do') {
                     if (value >= 5.0 && value <= 8.0) {
                         status = 'Tốt';
                         statusBadge = 'badge-good';
                         recommendation = 'Nồng độ oxy hòa tan lý tưởng cho cá chép. Tiếp tục sục khí bình thường.';
-                    } else if (value >= 4.0) {
-                        status = 'Cảnh báo';
-                        statusBadge = 'badge-warning';
-                        recommendation = 'DO thấp hơn mức tối ưu. Cá chép cần ít nhất 5 mg/L. Tăng tốc độ sục khí.';
-                    } else {
+                    } else if (value <= 4.5) {
                         status = 'Nguy hiểm';
                         statusBadge = 'badge-danger';
-                        recommendation = 'DO rất thấp! Cá chép có thể bị ngạt và chết. Tăng sục khí ngay lập tức.';
+                        recommendation = 'DO Thấp: Tăng cường sục khí, giảm nhiệt nước nếu quá cao, giảm mật độ cá nếu quá dày.';
+                    } else if (value > 10) {
+                        status = 'Cảnh báo';
+                        statusBadge = 'badge-warning';
+                        recommendation = 'DO cao: Giảm sục khí, tăng nhiệt độ nước nếu cần.';
                     }
                 } else if (sensor.key === 'ec') {
                     if (value >= 0.5 && value <= 1.5) {
                         status = 'Tốt';
                         statusBadge = 'badge-good';
                         recommendation = 'EC phù hợp cho cá chép. Cá chép ưa thích nước có độ dẫn điện thấp đến trung bình.';
-                    } else if (value >= 0.3 && value <= 2.0) {
+                    } else if (value < 0.5) {
                         status = 'Cảnh báo';
                         statusBadge = 'badge-warning';
-                        recommendation = 'EC hơi lệch khỏi mức tối ưu. Thay nước một phần nếu EC quá cao.';
-                    } else {
+                        recommendation = 'EC Thấp: Bổ sung khoáng chất như Canxi, Kali, Sắt... và vi lượng cho nước.';
+                    } else if (value > 1.5) {
                         status = 'Nguy hiểm';
                         statusBadge = 'badge-danger';
-                        recommendation = 'EC quá cao hoặc quá thấp. Cá chép có thể bị stress. Cần điều chỉnh ngay.';
+                        recommendation = 'EC Cao: Thay một phần nước bằng nước lọc hoặc nước mưa an toàn để pha loãng.';
                     }
                 } else if (sensor.key === 'tds') {
                     if (value >= 300 && value <= 1000) {
                         status = 'Tốt';
                         statusBadge = 'badge-good';
                         recommendation = 'TDS lý tưởng cho cá chép. Cá chép thích nước có độ mặn thấp đến trung bình.';
-                    } else if (value >= 200 && value <= 1300) {
+                    } else if (value < 300) {
                         status = 'Cảnh báo';
                         statusBadge = 'badge-warning';
-                        recommendation = 'TDS nằm ngoài phạm vi tối ưu. Thay nước một phần để điều chỉnh.';
-                    } else {
+                        recommendation = 'TDS Thấp: Bổ sung khoáng chất như Canxi, Kali, Magie... (Theo dõi tránh TDS tăng nhanh).';
+                    } else if (value > 1100) {
                         status = 'Nguy hiểm';
                         statusBadge = 'badge-danger';
-                        recommendation = 'TDS quá cao hoặc quá thấp. Có thể gây độc cho cá chép. Cần điều chỉnh ngay.';
+                        recommendation = 'TDS Cao: Thay một phần nước bằng nước lọc hoặc nước mưa an toàn để pha loãng; có thể vệ sinh hệ thống.';
                     }
                 } else if (sensor.key === 'temp') {
                     if (value >= 20 && value <= 28) {
                         status = 'Tốt';
                         statusBadge = 'badge-good';
-                        recommendation = 'Nhiệt độ lý tưởng cho cá chép. Cá chép phát triển tốt nhất ở 20-28°C.';
-                    } else if (value >= 15 && value <= 30) {
+                        recommendation = 'Nhiệt độ lý tưởng cho cá chép. Cá chép phát triển tốt nhất ở 20–28°C.';
+                    } else if (value < 18) {
                         status = 'Cảnh báo';
                         statusBadge = 'badge-warning';
-                        recommendation = 'Nhiệt độ hơi lệch. Cá chép có thể chịu được nhưng tăng trưởng sẽ chậm. Điều chỉnh nhiệt độ.';
-                    } else {
+                        recommendation = 'Nhiệt hơi thấp. Điều chỉnh nhiệt độ bằng máy sưởi.';
+                    } else if (value > 30) {
                         status = 'Nguy hiểm';
                         statusBadge = 'badge-danger';
-                        recommendation = 'Nhiệt độ quá nóng hoặc quá lạnh. Cá chép có thể bị sốc nhiệt. Cần điều chỉnh ngay.';
+                        recommendation = 'Nhiệt độ quá cao. Cá chép có thể bị sốc nhiệt. Tăng cường thông gió, che nắng.';
                     }
                 }
 
@@ -872,7 +933,6 @@
             modal.style.display = 'block';
         }
 
-        // Hàm đóng modal
         function closeSensorModal() {
             document.getElementById('sensorModal').style.display = 'none';
         }
@@ -881,7 +941,6 @@
             document.getElementById('analysisModal').style.display = 'none';
         }
 
-        // Đóng modal khi click ngoài
         window.onclick = function(event) {
             const sensorModal = document.getElementById('sensorModal');
             const analysisModal = document.getElementById('analysisModal');

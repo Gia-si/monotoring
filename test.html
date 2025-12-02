@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Đội TOSI - Aquaponics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;}
+
+        body{
+            font-family: "Segoe UI", Tahoma, sans-serif;
+            background: #f4f6fb;
+            min-height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            padding:20px;
+        }
+
+        .board{
+            width:100%;
+            max-width:1100px;
+            background:#ffffff;
+            border-radius:24px;
+            box-shadow:0 18px 50px rgba(0,0,0,0.18);
+            padding:28px 36px 36px;
+            position:relative;
+        }
+
+        /* Thanh tiêu đề trên cùng */
+        .board-header{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            margin-bottom:18px;
+            font-size:13px;
+            color:#7f8c8d;
+        }
+        .board-header-left{
+            display:flex;
+            align-items:center;
+            gap:10px;
+        }
+        .board-dot{
+            width:9px;
+            height:9px;
+            border-radius:50%;
+            background:#e74c3c;
+        }
+        .board-line{
+            width:80px;
+            height:2px;
+            background:linear-gradient(90deg,#1abc9c,#16a085);
+            border-radius:99px;
+        }
+        .refresh-btn{
+            width:22px;
+            height:22px;
+            border-radius:50%;
+            border:1px solid #dcdde1;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:13px;
+            cursor:pointer;
+            color:#7f8c8d;
+        }
+
+        /* Banner chính */
+        .banner{
+            border-radius:20px;
+            border:2px solid #1abc9c;
+            padding:26px 26px 22px;
+            text-align:center;
+            position:relative;
+        }
+        .banner-top{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:16px;
+            margin-bottom:10px;
+        }
+        .logo-wrap{
+            display:flex;
+            align-items:center;
+            gap:14px;
+        }
+        .logo-circle{
+            width:80px;
+            height:80px;
+            border-radius:20px;
+            background:linear-gradient(135deg,#1abc9c,#16a085);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            color:#fff;
+            font-size:32px;
+            font-weight:800;
+            letter-spacing:1px;
+        }
+        .brand-text{
+            text-align:left;
+        }
+        .brand-top{
+            font-size:28px;
+            font-weight:800;
+            letter-spacing:1px;
+        }
+        .brand-top span:first-child{
+            color:#2c3e50;
+        }
+        .brand-top span:last-child{
+            color:#1abc9c;
+        }
+        .brand-sub{
+            margin-top:3px;
+            font-size:13px;
+            font-weight:600;
+            color:#7f8c8d;
+        }
+
+        .project-name{
+            font-size:16px;
+            line-height:1.4;
+            text-align:right;
+            font-weight:600;
+            color:#2c3e50;
+        }
+        .project-name span{
+            display:block;
+            color:#1abc9c;
+            font-size:24px;
+        }
+
+        .divider{
+            height:2px;
+            width:100%;
+            margin:12px 0 10px;
+            background:linear-gradient(90deg,#1abc9c,#2980b9);
+            border-radius:99px;
+        }
+
+        .project-desc{
+            font-size:14px;
+            color:#2c3e50;
+            margin-bottom:10px;
+        }
+        .slogan{
+            font-size:14px;
+            color:#e67e22;
+            font-weight:700;
+            margin-bottom:16px;
+        }
+
+        /* Hàng thẻ công nghệ */
+        .param-row{
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px;
+            justify-content:center;
+        }
+        .param-btn{
+            min-width:96px;
+            padding:8px 10px;
+            border-radius:14px;
+            border:none;
+            background:#1abc9c;
+            color:#fff;
+            font-weight:600;
+            font-size:12px;
+            cursor:pointer;
+            box-shadow:0 3px 10px rgba(26,188,156,0.35);
+            transition:transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap:3px;
+        }
+        .param-btn:hover{
+            transform:translateY(-2px);
+            background:#16a085;
+            box-shadow:0 6px 16px rgba(22,160,133,0.4);
+        }
+        .param-icon{
+            font-size:20px;
+            line-height:1;
+        }
+        .param-label{
+            text-align:center;
+            line-height:1.2;
+        }
+
+        @media (max-width:768px){
+            .board{padding:18px;}
+            .logo-circle{width:64px;height:64px;font-size:26px;}
+            .brand-top{font-size:22px;}
+            .project-name{font-size:14px;}
+        }
+    </style>
+</head>
+<body>
+<div class="board">
+    <div class="board-header">
+        <div class="board-header-left">
+            <div class="board-dot"></div>
+            <div class="board-line"></div>
+            <span>BẢNG THÔNG TIN</span>
+        </div>
+        <div class="refresh-btn">⟳</div>
+    </div>
+
+    <div class="banner">
+        <div class="banner-top">
+            <div class="logo-wrap">
+                <div class="logo-circle">
+                    TO
+                </div>
+                <div class="brand-text">
+                    <div class="brand-top">
+                        <span>TOSI</span>
+                        <span>AQUA</span>
+                    </div>
+                    <div class="brand-sub">
+                        Design by TOSI 
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-name">
+                HỆ THỐNG AQUAPONICS TỰ ĐỘNG<br>
+                <span>NUÔI CÁ RÔ PHI &amp; TRỒNG RAU</span>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <p class="project-desc">
+            Ứng dụng LoRa, AIoT, điện toán đám mây, thị giác máy tính và xử lý ngôn ngữ tự nhiên
+            với mạng nơ-ron sâu để tối ưu hoá mô hình Aquaponics bền vững.
+        </p>
+        <p class="slogan">
+           Hướng tới nền nông-ngư nghiệp bền vững
+        </p>
+
+        <div class="param-row">
+            <button class="param-btn">
+                <span class="param-icon">👁️</span>
+                <span class="param-label">Computer<br>Vision</span>
+            </button>
+            <button class="param-btn">
+                <span class="param-icon">💬</span>
+                <span class="param-label">Xử lý<br>Ngôn ngữ</span>
+            </button>
+            <button class="param-btn">
+                <span class="param-icon">🔧</span>
+                <span class="param-label">Điện tử</span>
+            </button>
+            <button class="param-btn">
+                <span class="param-icon">☁️</span>
+                <span class="param-label">Cloud<br>Computing</span>
+            </button>
+            <button class="param-btn">
+                <span class="param-icon">📶</span>
+                <span class="param-label">LoRa</span>
+            </button>
+            <button class="param-btn">
+                <span class="param-icon">🌐</span>
+                <span class="param-label">IoT</span>
+            </button>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
